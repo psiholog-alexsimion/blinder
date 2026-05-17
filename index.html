@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blinder – Conectează-te cu vocea</title>
+  <meta name="description" content="Aplicație de apeluri pentru persoane nevăzătoare." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0d0d0d;
+      --surface:    #1a1a1a;
+      --border:     #2e2e2e;
+      --accent:     #f5c842;
+      --accent2:    #e8a020;
+      --green:      #3ddc84;
+      --red:        #ff4f4f;
+      --text:       #f0f0f0;
+      --muted:      #888;
+      --radius:     16px;
+      --focus-ring: 0 0 0 4px var(--accent);
+    }
+
+    html { font-size: 18px; }
+
+    body {
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 80px;
+    }
+
+    /* ── SKIP LINK ── */
+    .skip-link {
+      position: absolute; top: -200px; left: 1rem;
+      background: var(--accent); color: #000;
+      padding: 0.75rem 1.25rem; border-radius: 8px;
+      font-weight: 700; font-size: 1rem;
+      z-index: 9999; transition: top 0.15s;
+      text-decoration: none;
+    }
+    .skip-link:focus { top: 1rem; outline: 3px solid #000; }
+
+    /* ── HEADER ── */
+    header {
+      width: 100%; max-width: 600px;
+      padding: 2rem 1.5rem 1rem;
+      text-align: center;
+    }
+    .logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 2.2rem; font-weight: 700;
+      color: var(--accent); letter-spacing: -1px;
+    }
+    .tagline { font-size: 0.9rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* ── VOICE STATUS ── */
+    #voice-status {
+      width: 100%; max-width: 600px;
+      padding: 0 1.25rem 0.5rem;
+    }
+    #voice-status-inner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+      font-size: 0.85rem; color: var(--muted);
+    }
+    #voice-name { color: var(--accent); font-weight: 700; font-size: 0.85rem; }
+
+    /* ── MAIN ── */
+    main {
+      width: 100%; max-width: 600px;
+      padding: 0 1.25rem;
+      display: flex; flex-direction: column; gap: 1.75rem;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .card-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── INPUTS ── */
+    .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .field:last-of-type { margin-bottom: 0; }
+
+    label {
+      font-size: 0.95rem; font-weight: 700; color: var(--text);
+    }
+
+    input[type="text"], input[type="tel"] {
+      width: 100%; padding: 0.9rem 1rem;
+      background: var(--bg); border: 2px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      font-size: 1rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: var(--focus-ring);
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.9rem 1.5rem; border-radius: 10px;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer; border: 2px solid transparent;
+      text-decoration: none; transition: transform 0.1s, filter 0.15s;
+    }
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary { background: var(--accent); color: #000; width: 100%; margin-top: 0.5rem; }
+    .btn-primary:hover { background: var(--accent2); }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border); color: var(--text);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-call-green {
+      background: var(--green); color: #000;
+      width: 100%; font-size: 1.1rem; padding: 1rem;
+    }
+    .btn-call-green:hover { filter: brightness(1.1); }
+
+    /* ── PROFILE VIEW ── */
+    #profile-display-name {
+      font-size: 1.15rem; font-weight: 700; margin-bottom: 0.2rem;
+    }
+    #profile-display-phone {
+      font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;
+    }
+
+    .profile-actions {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+    }
+    .profile-actions .btn { flex: 1; min-width: 140px; font-size: 0.9rem; padding: 0.7rem 1rem; }
+
+    /* ── STATUS BADGE ── */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.85rem; border-radius: 999px;
+      font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem;
+    }
+    .status-badge.online {
+      background: rgba(61,220,132,0.15); color: var(--green);
+      border: 1px solid rgba(61,220,132,0.3);
+    }
+    .status-badge.offline {
+      background: rgba(136,136,136,0.12); color: var(--muted);
+      border: 1px solid rgba(136,136,136,0.2);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .dot.pulse { animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:0.4; transform:scale(0.7); }
+    }
+
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .tab-btn {
+      flex: 1; padding: 0.7rem; border-radius: 8px;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      border: 2px solid var(--border);
+      background: transparent; color: var(--muted);
+    }
+    .tab-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+    .tab-btn[aria-selected="true"] {
+      background: var(--accent); color: #000; border-color: var(--accent);
+    }
+
+    /* ── USER LIST ── */
+    .user-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .user-item {
+      display: flex; align-items: center;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.25rem; gap: 1rem;
+    }
+
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-weight: 700; font-size: 1rem; }
+    .user-status { font-size: 0.82rem; margin-top: 0.2rem; }
+
+    .user-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+
+    .icon-btn {
+      width: 54px; height: 54px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid transparent; cursor: pointer; background: none;
+      font-size: 1.4rem;
+    }
+    .icon-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+    .icon-btn:active { transform: scale(0.93); }
+
+    .icon-btn.call-btn { background: var(--green); color: #000; }
+    .icon-btn.call-btn:hover { filter: brightness(1.1); }
+
+    .icon-btn.fav-btn {
+      background: var(--surface); border-color: var(--border); color: var(--accent);
+    }
+    .icon-btn.fav-btn:hover { border-color: var(--accent); }
+    .icon-btn.fav-btn[aria-pressed="true"] { background: var(--accent); color: #000; }
+
+    .empty {
+      text-align: center; color: var(--muted);
+      padding: 2rem 1rem; font-size: 0.95rem; line-height: 1.7;
+    }
+
+    /* ── VOICE CONTROLS CARD ── */
+    #voice-card .voice-row {
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+    #voice-card label { font-size: 0.9rem; white-space: nowrap; }
+    #tts-speed {
+      flex: 1; min-width: 80px;
+      accent-color: var(--accent); cursor: pointer; height: 6px;
+    }
+    #tts-speed:focus { outline: 3px solid var(--accent); border-radius: 4px; }
+    #tts-speed-val {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem; color: var(--accent); min-width: 3ch;
+    }
+
+    .voice-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .voice-btns .btn { flex: 1; min-width: 120px; font-size: 0.9rem; padding: 0.7rem 1rem; }
+
+    .btn-stop { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-stop:hover { filter: brightness(1.1); }
+
+    .btn-help { border-color: var(--accent); color: var(--accent); }
+    .btn-help:hover { background: rgba(245,200,66,0.1); }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; padding: 1.5rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem;
+      max-width: 460px; width: 100%;
+      transform: translateY(16px); transition: transform 0.2s;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-backdrop.open .modal { transform: translateY(0); }
+
+    /* ── CALL MODAL ── */
+    #call-modal .modal { text-align: center; }
+    .modal-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .modal-caller {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--accent); margin-bottom: 0.5rem;
+    }
+    .modal-question {
+      color: var(--muted); font-size: 1rem;
+      margin-bottom: 1.75rem; line-height: 1.6;
+    }
+    .modal-call-actions { display: flex; gap: 0.75rem; }
+    .modal-call-actions .btn { flex: 1; }
+
+    /* ── TUTORIAL MODAL ── */
+    #tutorial-modal .modal { text-align: left; max-width: 520px; }
+
+    .tutorial-step {
+      display: flex; gap: 1rem; align-items: flex-start;
+      padding: 0.9rem 0; border-bottom: 1px solid var(--border);
+    }
+    .tutorial-step:last-of-type { border-bottom: none; }
+
+    .step-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--accent); min-width: 26px; padding-top: 0.1rem;
+    }
+    .step-text { font-size: 0.95rem; line-height: 1.65; }
+    .step-text strong { color: var(--accent); }
+
+    .tutorial-btns { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .tutorial-btns .btn { flex: 1; min-width: 130px; }
+
+    /* ── SPEAKING INDICATOR ── */
+    #speaking-dot {
+      position: fixed; bottom: 1.25rem; right: 1.25rem;
+      background: var(--accent); color: #000;
+      border-radius: 999px; padding: 0.45rem 1rem;
+      font-size: 0.82rem; font-weight: 700;
+      display: flex; align-items: center; gap: 0.5rem;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none; z-index: 400;
+    }
+    #speaking-dot.on { opacity: 1; transform: translateY(0); }
+    .wave { display: flex; gap: 2px; align-items: center; }
+    .wave span {
+      display: block; width: 3px; background: #000; border-radius: 3px;
+      animation: wv 0.75s ease-in-out infinite;
+    }
+    .wave span:nth-child(1) { height:8px;  animation-delay:0s; }
+    .wave span:nth-child(2) { height:14px; animation-delay:0.15s; }
+    .wave span:nth-child(3) { height:8px;  animation-delay:0.3s; }
+    @keyframes wv {
+      0%,100% { transform:scaleY(1); }
+      50%      { transform:scaleY(0.35); }
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 4.5rem; left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 0.7rem 1.5rem;
+      border-radius: 999px; font-size: 0.9rem; font-weight: 700;
+      z-index: 300; transition: transform 0.3s;
+      white-space: nowrap; pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── ARIA LIVE ── */
+    #ar {
+      position: absolute; width:1px; height:1px;
+      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap;
+    }
+
+    @media (max-width:420px) {
+      html { font-size: 16px; }
+      .modal-call-actions, .tutorial-btns { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Skip link — primul element Tab -->
+<a class="skip-link" href="#main" tabindex="1">Sari direct la conținut</a>
+
+<!-- Aria live region pentru screen readere -->
+<div id="ar" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="logo" aria-label="Blinder">Blinder</div>
+  <p class="tagline">Conectează-te cu vocea</p>
+</header>
+
+<!-- ══ VOICE STATUS BAR ══ -->
+<div id="voice-status" aria-live="polite">
+  <div id="voice-status-inner">
+    <span aria-hidden="true">🔊</span>
+    <span>Voce activă:</span>
+    <span id="voice-name">Se caută...</span>
+    <span id="voice-lang" style="color:var(--muted);font-size:0.8rem;"></span>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<main id="main">
+
+  <!-- ══ 1. CONTROALE VOCE — primul în Tab order ══ -->
+  <section class="card" id="voice-card" aria-labelledby="voice-card-title">
+    <div class="card-title" id="voice-card-title">Controale voce</div>
+
+    <div class="voice-row">
+      <label for="tts-speed">Viteză:</label>
+      <input
+        type="range" id="tts-speed"
+        min="0.5" max="2" step="0.1" value="1"
+        aria-label="Viteză voce, curent: 1 ori normal"
+        aria-valuemin="0.5" aria-valuemax="2" aria-valuenow="1"
+        tabindex="2"
+      />
+      <span id="tts-speed-val" aria-hidden="true">1×</span>
+    </div>
+
+    <div class="voice-btns">
+      <button class="btn btn-stop" tabindex="3"
+        onclick="stopSpeech()"
+        onfocus="speakFocus('Buton Oprește vocea')"
+        aria-label="Oprește vocea acum">
+        ⏹ Oprește vocea
+      </button>
+      <button class="btn btn-ghost btn-help" tabindex="4"
+        onclick="openTutorial(false)"
+        onfocus="speakFocus('Buton Cum funcționează, apasă Enter pentru tutorial')"
+        aria-label="Cum funcționează — deschide tutorialul audio">
+        ❓ Cum funcționează?
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ 2. PROFIL ══ -->
+  <section class="card" id="profile-section" aria-labelledby="profile-title">
+    <div class="card-title" id="profile-title">Profilul tău</div>
+
+    <!-- FORMULAR (vizibil la start) -->
+    <div id="profile-form" aria-label="Formular creare profil">
+      <div class="field">
+        <label for="input-name">Nume sau pseudonim</label>
+        <input
+          type="text" id="input-name"
+          placeholder="Ex: Maria sau Anonim"
+          autocomplete="nickname"
+          aria-required="true"
+          aria-describedby="name-hint"
+          maxlength="30"
+          tabindex="5"
+          onfocus="speakFocus('Câmpul Nume sau pseudonim. Introdu cum vrei să fii văzut de alții.')"
+        />
+        <span id="name-hint" style="font-size:0.8rem;color:var(--muted);">Poți folosi un pseudonim dacă preferi anonimatul.</span>
+      </div>
+
+      <div class="field">
+        <label for="input-phone">Numărul tău de telefon</label>
+        <input
+          type="tel" id="input-phone"
+          placeholder="+40 7XX XXX XXX"
+          autocomplete="tel"
+          aria-required="true"
+          aria-describedby="phone-hint"
+          inputmode="tel"
+          tabindex="6"
+          onfocus="speakFocus('Câmpul Număr de telefon. Introdu numărul cu prefixul țării, de exemplu plus 40.')"
+        />
+        <span id="phone-hint" style="font-size:0.8rem;color:var(--muted);">Exemplu: plus 40 7XX XXX XXX</span>
+      </div>
+
+      <button class="btn btn-primary" id="save-btn"
+        tabindex="7"
+        aria-label="Salvează profilul și intră în aplicație"
+        onfocus="speakFocus('Buton Intră în aplicație. Apasă Enter pentru a salva profilul.')"
+        onclick="saveProfile()">
+        📲 Intră în aplicație
+      </button>
+    </div>
+
+    <!-- PROFIL SALVAT (ascuns la start) -->
+    <div id="profile-view" hidden aria-label="Profilul salvat">
+      <div id="profile-display-name" aria-live="polite"></div>
+      <div id="profile-display-phone"></div>
+
+      <div id="status-badge" class="status-badge offline"
+        role="status" aria-label="Ești offline">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="status-label">Offline</span>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn btn-ghost" id="toggle-status-btn"
+          tabindex="8"
+          aria-label="Arată-mă disponibil pentru apeluri"
+          onfocus="speakFocus('Buton schimbare status. Apasă Enter pentru a deveni disponibil sau offline.')"
+          onclick="toggleStatus()">
+          🟢 Arată-mă disponibil
+        </button>
+        <button class="btn btn-ghost" id="edit-btn"
+          tabindex="9"
+          aria-label="Editează profilul — schimbă numele sau numărul"
+          onfocus="speakFocus('Buton Editează profilul.')"
+          onclick="editProfile()">
+          ✏️ Editează
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 3. CONTACTE ══ -->
+  <section class="card" id="contacts-section" aria-labelledby="contacts-title" hidden>
+    <div class="card-title" id="contacts-title">Contacte</div>
+
+    <!-- TABS -->
+    <div class="tabs" role="tablist" aria-label="Alege secțiunea de contacte">
+      <button class="tab-btn" role="tab"
+        id="tab-online" aria-selected="true" aria-controls="panel-online"
+        tabindex="10"
+        onfocus="speakFocus('Tab Online acum — persoane disponibile pentru apel')"
+        onclick="switchTab('online')">
+        🟢 Online acum
+      </button>
+      <button class="tab-btn" role="tab"
+        id="tab-fav" aria-selected="false" aria-controls="panel-fav"
+        tabindex="11"
+        onfocus="speakFocus('Tab Favoriți — contactele tale salvate')"
+        onclick="switchTab('fav')">
+        ⭐ Favoriți
+      </button>
+    </div>
+
+    <div id="panel-online" role="tabpanel" aria-labelledby="tab-online">
+      <div id="online-list" class="user-list"></div>
+    </div>
+
+    <div id="panel-fav" role="tabpanel" aria-labelledby="tab-fav" hidden>
+      <div id="fav-list" class="user-list"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══ MODAL: CONFIRMARE APEL ══ -->
+<div class="modal-backdrop" id="call-modal"
+  role="dialog" aria-modal="true"
+  aria-labelledby="call-modal-title"
+  aria-describedby="call-modal-question">
+
+  <div class="modal">
+    <div class="modal-icon" aria-hidden="true">📞</div>
+    <div class="modal-caller" id="call-modal-title"></div>
+    <div class="modal-question" id="call-modal-question"></div>
+    <div class="modal-call-actions">
+      <button class="btn btn-ghost" id="call-cancel"
+        aria-label="Anulează apelul"
+        onclick="closeCallModal()">
+        ✕ Anulează
+      </button>
+      <a class="btn btn-call-green" id="call-confirm"
+        href="#" role="button"
+        aria-label="Confirmă și sună">
+        📞 Sună acum
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: TUTORIAL ══ -->
+<div class="modal-backdrop" id="tutorial-modal"
+  role="dialog" aria-modal="true"
+  aria-labelledby="tutorial-title">
+
+  <div class="modal">
+    <div style="text-align:center;font-size:3rem;margin-bottom:1rem;" aria-hidden="true">🎧</div>
+    <h2 id="tutorial-title"
+      style="font-family:'Space Mono',monospace;color:var(--accent);
+             margin-bottom:1.25rem;font-size:1.1rem;text-align:center;">
+      Cum funcționează Blinder
+    </h2>
+
+    <div class="tutorial-step">
+      <span class="step-num" aria-hidden="true">1</span>
+      <div class="step-text"><strong>Profilul tău</strong> — Introdu numele și numărul de telefon. Poți folosi un pseudonim.</div>
+    </div>
+    <div class="tutorial-step">
+      <span class="step-num" aria-hidden="true">2</span>
+      <div class="step-text"><strong>Disponibilitate</strong> — Apasă „Arată-mă disponibil" ca alți utilizatori să te poată suna.</div>
+    </div>
+    <div class="tutorial-step">
+      <span class="step-num" aria-hidden="true">3</span>
+      <div class="step-text"><strong>Sună pe cineva</strong> — În „Online acum" găsești persoanele disponibile. Apasă butonul 📞 de lângă un nume.</div>
+    </div>
+    <div class="tutorial-step">
+      <span class="step-num" aria-hidden="true">4</span>
+      <div class="step-text"><strong>Confirmare apel</strong> — Apare un dialog: apasă „Sună acum" sau „Anulează".</div>
+    </div>
+    <div class="tutorial-step">
+      <span class="step-num" aria-hidden="true">5</span>
+      <div class="step-text"><strong>Favoriți</strong> — Apasă ⭐ lângă un utilizator pentru a-l salva. Îi găsești în tabul „Favoriți".</div>
+    </div>
+    <div class="tutorial-step">
+      <span class="step-num" aria-hidden="true">6</span>
+      <div class="step-text"><strong>Vocea aplicației</strong> — Totul se citește cu voce tare. Schimbă viteza sau apasă „Oprește vocea" oricând.</div>
+    </div>
+    <div class="tutorial-step">
+      <span class="step-num" aria-hidden="true">7</span>
+      <div class="step-text"><strong>Navigare cu Tab</strong> — Apasă tasta Tab pentru a trece la elementul următor. Enter activează butoanele. Escape închide orice dialog.</div>
+    </div>
+
+    <div class="tutorial-btns">
+      <button class="btn btn-primary" id="read-aloud-btn"
+        aria-label="Citește tutorialul cu voce tare"
+        onclick="readTutorialAloud()">
+        🔊 Citește cu voce tare
+      </button>
+      <button class="btn btn-ghost"
+        aria-label="Închide tutorialul"
+        onclick="closeTutorial()">
+        ✓ Am înțeles
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SPEAKING INDICATOR ══ -->
+<div id="speaking-dot" aria-hidden="true">
+  <div class="wave"><span></span><span></span><span></span></div>
+  <span>Vorbesc...</span>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════ -->
+<script>
+// ─────────────────────────────────────────
+//  TTS ENGINE
+// ─────────────────────────────────────────
+const synth = window.speechSynthesis;
+let ttsVoice    = null;
+let ttsRate     = 1.0;
+let speechQ     = [];
+let ttsRunning  = false;
+let userReady   = false;   // browser requires user gesture before speech
+let focusCooldown = false; // prevent double-speak on click+focus
+
+// Find best Romanian voice
+function pickVoice() {
+  const all = synth.getVoices();
+  if (!all.length) return;
+
+  // Priority list for Romanian on Windows/Chrome/Edge/Firefox
+  const roVoice =
+    all.find(v => v.lang === 'ro-RO' && v.localService) ||   // local Romanian
+    all.find(v => v.lang === 'ro-RO') ||                     // remote Romanian
+    all.find(v => v.lang.startsWith('ro')) ||                // any Romanian
+    all.find(v => v.default) ||
+    all[0];
+
+  ttsVoice = roVoice || null;
+
+  // Update UI
+  if (ttsVoice) {
+    document.getElementById('voice-name').textContent = ttsVoice.name;
+    document.getElementById('voice-lang').textContent = `(${ttsVoice.lang})`;
+  } else {
+    document.getElementById('voice-name').textContent = 'Voce implicită';
+  }
+}
+
+// Voices load async — listen for both immediate and async
+if (synth.getVoices().length) pickVoice();
+synth.addEventListener('voiceschanged', pickVoice);
+
+function speak(text, priority = false) {
+  if (!synth) return;
+  if (priority) { synth.cancel(); speechQ = []; ttsRunning = false; }
+  speechQ.push(text);
+  if (!ttsRunning) drainQueue();
+}
+
+function drainQueue() {
+  if (!speechQ.length || !userReady) {
+    ttsRunning = false;
+    document.getElementById('speaking-dot').classList.remove('on');
+    return;
+  }
+  ttsRunning = true;
+  document.getElementById('speaking-dot').classList.add('on');
+
+  const utt  = new SpeechSynthesisUtterance(speechQ.shift());
+  utt.lang   = 'ro-RO';
+  utt.rate   = ttsRate;
+  if (ttsVoice) utt.voice = ttsVoice;
+
+  utt.onend   = () => { ttsRunning = false; drainQueue(); };
+  utt.onerror = (e) => {
+    // Ignore 'interrupted' — it's from our own cancel()
+    if (e.error !== 'interrupted') console.warn('TTS error:', e.error);
+    ttsRunning = false;
+    drainQueue();
+  };
+
+  synth.speak(utt);
+}
+
+function stopSpeech() {
+  synth.cancel();
+  speechQ    = [];
+  ttsRunning = false;
+  document.getElementById('speaking-dot').classList.remove('on');
+  // Don't speak after stop — user wants silence
+}
+
+// Called on every focus event for interactive elements
+// Cooldown prevents double-speak when user clicks (triggers both focus & click)
+function speakFocus(text) {
+  if (focusCooldown) return;
+  speak(text, true);
+}
+
+function setFocusCooldown() {
+  focusCooldown = true;
+  setTimeout(() => { focusCooldown = false; }, 300);
+}
+
+// Speed control
+function updateSpeed(val) {
+  ttsRate = parseFloat(val);
+  const display = ttsRate === 1 ? 'normal' : `${ttsRate} ori`;
+  document.getElementById('tts-speed-val').textContent = `${ttsRate}×`;
+  document.getElementById('tts-speed').setAttribute('aria-valuenow', ttsRate);
+  document.getElementById('tts-speed').setAttribute('aria-label',
+    `Viteză voce, curent: ${display}`);
+  speak(`Viteză: ${display}`, true);
+}
+
+// ─────────────────────────────────────────
+//  DATE DEMO
+// ─────────────────────────────────────────
+const USERS = [
+  { id:'u1', name:'Maria',    phone:'+40721000001', online:true  },
+  { id:'u2', name:'Andrei',   phone:'+40721000002', online:true  },
+  { id:'u3', name:'Elena',    phone:'+40721000003', online:false },
+  { id:'u4', name:'Gheorghe', phone:'+40721000004', online:true  },
+  { id:'u5', name:'Anonim',   phone:'+40721000005', online:false },
+];
+
+// ─────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────
+let profile     = null;
+let favorites   = new Set(JSON.parse(localStorage.getItem('blinder_favs') || '[]'));
+let isAvailable = false;
+let activeTab   = 'online';
+let userTabIdx  = 20; // dynamic tabindex start for user buttons
+
+// ─────────────────────────────────────────
+//  BOOT
+// ─────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved      = localStorage.getItem('blinder_profile');
+  const firstVisit = !localStorage.getItem('blinder_visited');
+
+  if (saved) {
+    profile = JSON.parse(saved);
+    showProfileView();
+    showContacts();
+    renderLists();
+  }
+
+  // Speed slider
+  document.getElementById('tts-speed').addEventListener('input', e => updateSpeed(e.target.value));
+  document.getElementById('tts-speed').addEventListener('focus', () => {
+    speakFocus(`Slider viteză voce. Valoare curentă: ${ttsRate} ori. Folosește săgețile stânga-dreapta pentru a modifica.`);
+  });
+
+  // Escape closes modals
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeCallModal(); closeTutorial(); }
+  });
+
+  // Modal backdrop clicks
+  document.getElementById('call-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeCallModal();
+  });
+  document.getElementById('tutorial-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeTutorial();
+  });
+
+  // ── USER GESTURE UNLOCK ──
+  // Browsers block autoplay speech until the user interacts.
+  // We listen for first click/keydown anywhere on the page.
+  const unlock = () => {
+    if (userReady) return;
+    userReady = true;
+
+    if (firstVisit) {
+      localStorage.setItem('blinder_visited', '1');
+      speak('Bun venit la Blinder! Deschid tutorialul. Apasă butonul Citește cu voce tare pentru a asculta instrucțiunile.');
+      setTimeout(() => openTutorial(false), 400);
+    } else if (profile) {
+      speak(`Bun venit înapoi, ${profile.name}!`);
+    } else {
+      speak('Bun venit la Blinder. Introdu numele și numărul tău pentru a începe.');
+    }
+  };
+
+  document.addEventListener('click',   unlock, { once: true });
+  document.addEventListener('keydown', unlock, { once: true });
+
+  // Cooldown on all buttons to prevent double-speak
+  document.addEventListener('mousedown', setFocusCooldown);
+  document.addEventListener('touchstart', setFocusCooldown);
+});
+
+// ─────────────────────────────────────────
+//  TUTORIAL
+// ─────────────────────────────────────────
+const TUTORIAL_LINES = [
+  'Bun venit la Blinder, aplicația de apeluri pentru persoane nevăzătoare.',
+  'Pasul unu. Profilul tău. Introdu numele și numărul de telefon. Poți folosi un pseudonim.',
+  'Pasul doi. Disponibilitate. Apasă butonul Arată-mă disponibil ca alți utilizatori să te poată suna.',
+  'Pasul trei. Sună pe cineva. În tabul Online acum găsești persoanele disponibile. Apasă butonul cu telefonul de lângă un nume.',
+  'Pasul patru. Confirmare apel. Apare un dialog: apasă Sună acum sau Anulează.',
+  'Pasul cinci. Favoriți. Apasă steluța lângă un utilizator pentru a-l salva. Îi găsești în tabul Favoriți.',
+  'Pasul șase. Vocea aplicației. Totul se citește cu voce tare. Schimbă viteza sau apasă Oprește vocea oricând.',
+  'Pasul șapte. Navigare cu Tab. Apasă tasta Tab pentru a trece la elementul următor. Enter activează butoanele. Escape închide orice dialog.',
+  'Tutorialul s-a terminat. Apasă Am înțeles pentru a folosi aplicația.',
+];
+
+function openTutorial(autoRead = false) {
+  document.getElementById('tutorial-modal').classList.add('open');
+  arLive('Dialog tutorial deschis.');
+  if (autoRead) {
+    setTimeout(readTutorialAloud, 300);
+  } else {
+    speak('Tutorial deschis. Apasă Citește cu voce tare pentru instrucțiuni audio.', true);
+    setTimeout(() => document.getElementById('read-aloud-btn').focus(), 150);
+  }
+}
+
+function closeTutorial() {
+  document.getElementById('tutorial-modal').classList.remove('open');
+  stopSpeech();
+  arLive('Tutorial închis.');
+  speak('Tutorial închis.');
+}
+
+function readTutorialAloud() {
+  stopSpeech();
+  TUTORIAL_LINES.forEach(l => speak(l));
+}
+
+// ─────────────────────────────────────────
+//  PROFIL
+// ─────────────────────────────────────────
+function saveProfile() {
+  const name  = document.getElementById('input-name').value.trim();
+  const phone = document.getElementById('input-phone').value.trim();
+
+  if (!name) {
+    speak('Eroare: te rugăm să introduci un nume sau pseudonim.', true);
+    document.getElementById('input-name').focus();
+    return;
+  }
+  if (!phone) {
+    speak('Eroare: te rugăm să introduci numărul de telefon.', true);
+    document.getElementById('input-phone').focus();
+    return;
+  }
+
+  profile = { name, phone };
+  localStorage.setItem('blinder_profile', JSON.stringify(profile));
+
+  showProfileView();
+  showContacts();
+  renderLists();
+  speak(`Profil salvat. Bun venit, ${name}! Acum poți vedea utilizatorii disponibili.`, true);
+  setTimeout(() => document.getElementById('toggle-status-btn').focus(), 300);
+}
+
+function showProfileView() {
+  document.getElementById('profile-form').hidden = true;
+  document.getElementById('profile-view').hidden = false;
+  document.getElementById('profile-display-name').textContent = profile.name;
+  document.getElementById('profile-display-phone').textContent = profile.phone;
+}
+
+function editProfile() {
+  document.getElementById('profile-view').hidden = true;
+  document.getElementById('profile-form').hidden = false;
+  document.getElementById('input-name').value  = profile.name;
+  document.getElementById('input-phone').value = profile.phone;
+  speak('Editare profil. Modifică datele și apasă Intră în aplicație.', true);
+  setTimeout(() => document.getElementById('input-name').focus(), 100);
+}
+
+function toggleStatus() {
+  isAvailable = !isAvailable;
+  const badge = document.getElementById('status-badge');
+  const label = document.getElementById('status-label');
+  const btn   = document.getElementById('toggle-status-btn');
+  const dot   = badge.querySelector('.dot');
+
+  if (isAvailable) {
+    badge.className = 'status-badge online';
+    badge.setAttribute('aria-label', 'Ești disponibil pentru apeluri');
+    label.textContent = 'Disponibil';
+    dot.classList.add('pulse');
+    btn.textContent = '🔴 Arată-mă ocupat';
+    btn.setAttribute('aria-label', 'Arată-mă ocupat — schimbă statusul la offline');
+    speak('Ești acum disponibil. Alți utilizatori te pot vedea și suna.', true);
+  } else {
+    badge.className = 'status-badge offline';
+    badge.setAttribute('aria-label', 'Ești offline');
+    label.textContent = 'Offline';
+    dot.classList.remove('pulse');
+    btn.textContent = '🟢 Arată-mă disponibil';
+    btn.setAttribute('aria-label', 'Arată-mă disponibil pentru apeluri');
+    speak('Ești acum offline. Alți utilizatori nu te pot suna.', true);
+  }
+}
+
+// ─────────────────────────────────────────
+//  CONTACTE
+// ─────────────────────────────────────────
+function showContacts() {
+  document.getElementById('contacts-section').hidden = false;
+}
+
+function renderLists() {
+  renderOnline();
+  renderFav();
+}
+
+function renderOnline() {
+  const el = document.getElementById('online-list');
+  const list = USERS.filter(u => u.online);
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">Niciun utilizator disponibil momentan.<br>Încearcă mai târziu.</div>';
+    return;
+  }
+  el.innerHTML = '';
+  list.forEach((u, i) => el.appendChild(makeUserItem(u, 20 + i * 2)));
+}
+
+function renderFav() {
+  const el = document.getElementById('fav-list');
+  const list = USERS.filter(u => favorites.has(u.id));
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">Nu ai favoriți încă.<br>Apasă ⭐ lângă un utilizator pentru a-l adăuga.</div>';
+    return;
+  }
+  el.innerHTML = '';
+  list.forEach((u, i) => el.appendChild(makeUserItem(u, 50 + i * 2)));
+}
+
+function makeUserItem(user, baseTab) {
+  const isFav = favorites.has(user.id);
+  const statusTxt = user.online ? 'Disponibil pentru apel' : 'Offline';
+  const favLabel  = isFav
+    ? `Elimină din favoriți pe ${user.name}`
+    : `Adaugă la favoriți pe ${user.name}`;
+  const callLabel = `Sună pe ${user.name}. ${statusTxt}.`;
+
+  const item = document.createElement('div');
+  item.className = 'user-item';
+  item.setAttribute('role', 'listitem');
+
+  item.innerHTML = `
+    <div class="user-info">
+      <div class="user-name">${esc(user.name)}</div>
+      <div class="user-status">
+        ${ user.online
+          ? '<span style="color:var(--green)">● Disponibil</span>'
+          : '<span style="color:var(--muted)">○ Offline</span>' }
+      </div>
+    </div>
+    <div class="user-actions">
+      <button
+        class="icon-btn fav-btn"
+        aria-label="${favLabel}"
+        aria-pressed="${isFav}"
+        tabindex="${baseTab}"
+        data-uid="${user.id}"
+        data-action="fav"
+      >${isFav ? '★' : '☆'}</button>
+      <button
+        class="icon-btn call-btn"
+        aria-label="${callLabel}"
+        tabindex="${baseTab + 1}"
+        data-uid="${user.id}"
+        data-action="call"
+      >📞</button>
+    </div>
+  `;
+
+  // Events after building
+  item.querySelector('[data-action="fav"]').addEventListener('focus', () => {
+    speakFocus(favLabel);
+  });
+  item.querySelector('[data-action="call"]').addEventListener('focus', () => {
+    speakFocus(callLabel);
+  });
+  item.querySelector('[data-action="fav"]').addEventListener('click', () => {
+    setFocusCooldown(); toggleFav(user.id);
+  });
+  item.querySelector('[data-action="call"]').addEventListener('click', () => {
+    setFocusCooldown(); initiateCall(user.id);
+  });
+
+  return item;
+}
+
+// ─────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  const isOnline = tab === 'online';
+
+  document.getElementById('tab-online').setAttribute('aria-selected', isOnline ? 'true' : 'false');
+  document.getElementById('tab-fav').setAttribute('aria-selected', isOnline ? 'false' : 'true');
+  document.getElementById('panel-online').hidden = !isOnline;
+  document.getElementById('panel-fav').hidden    =  isOnline;
+
+  if (isOnline) {
+    const n = USERS.filter(u => u.online).length;
+    speak(`Online acum. ${n} utilizatori disponibili.`, true);
+  } else {
+    const n = USERS.filter(u => favorites.has(u.id)).length;
+    speak(`Favoriți. ${n} contacte salvate.`, true);
+  }
+}
+
+// ─────────────────────────────────────────
+//  FAVORIȚI
+// ─────────────────────────────────────────
+function toggleFav(uid) {
+  const user = USERS.find(u => u.id === uid);
+  if (!user) return;
+  if (favorites.has(uid)) {
+    favorites.delete(uid);
+    toast(`${user.name} eliminat din favoriți`);
+    speak(`${user.name} eliminat din favoriți.`, true);
+  } else {
+    favorites.add(uid);
+    toast(`${user.name} adăugat la favoriți`);
+    speak(`${user.name} adăugat la favoriți.`, true);
+  }
+  localStorage.setItem('blinder_favs', JSON.stringify([...favorites]));
+  renderLists();
+}
+
+// ─────────────────────────────────────────
+//  APEL
+// ─────────────────────────────────────────
+function initiateCall(uid) {
+  const user = USERS.find(u => u.id === uid);
+  if (!user) return;
+
+  document.getElementById('call-modal-title').textContent    = user.name;
+  document.getElementById('call-modal-question').textContent = `Ești pe cale să suni pe ${user.name}. Confirmi?`;
+  document.getElementById('call-confirm').href = `tel:${user.phone}`;
+  document.getElementById('call-confirm').setAttribute('aria-label', `Confirmă și sună pe ${user.name}`);
+
+  document.getElementById('call-modal').classList.add('open');
+  arLive(`Dialog apel: ${user.name}`);
+
+  speak(
+    `Confirmare apel. Ești pe cale să suni pe ${user.name}. Apasă Sună acum pentru a confirma sau Anulează pentru a renunța.`,
+    true
+  );
+
+  setTimeout(() => document.getElementById('call-confirm').focus(), 200);
+
+  // Focus management on confirm
+  document.getElementById('call-confirm').onfocus = () => {
+    speakFocus(`Buton Sună acum pe ${user.name}. Apasă Enter pentru a suna.`);
+  };
+  document.getElementById('call-cancel').onfocus = () => {
+    speakFocus('Buton Anulează apelul.');
+  };
+}
+
+function closeCallModal() {
+  document.getElementById('call-modal').classList.remove('open');
+  speak('Apel anulat.', true);
+}
+
+// ─────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────
+function arLive(msg) {
+  const el = document.getElementById('ar');
+  el.textContent = '';
+  requestAnimationFrame(() => { el.textContent = msg; });
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+  );
+}
+</script>
+</body>
+</html>
