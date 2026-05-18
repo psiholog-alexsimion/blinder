@@ -1,32 +1,54 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Blinder – Conectează-te cu vocea</title>
-  <meta name="description" content="Aplicație de apeluri pentru persoane nevăzătoare." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-    :root {
-      --bg:         #0d0d0d;
-      --surface:    #1a1a1a;
-      --border:     #2e2e2e;
-      --accent:     #f5c842;
-      --accent2:    #e8a020;
-      --green:      #3ddc84;
-      --red:        #ff4f4f;
-      --text:       #f0f0f0;
-      --muted:      #888;
-      --radius:     16px;
-      --focus-ring: 0 0 0 4px var(--accent);
+    :root{
+      /* Palette — warm dark */
+      --bg:       #111010;
+      --bg2:      #1a1816;
+      --surface:  #201e1b;
+      --surface2: #2a2723;
+      --border:   #38332d;
+      --border2:  #4a4440;
+
+      /* Warm amber accent */
+      --accent:   #f0a500;
+      --accent2:  #d48f00;
+      --accent-s: rgba(240,165,0,.12);
+
+      /* Semantic */
+      --green:    #4ade80;
+      --green-s:  rgba(74,222,128,.12);
+      --red:      #f87171;
+      --red-s:    rgba(248,113,113,.12);
+      --blue:     #60a5fa;
+
+      /* Text */
+      --text:     #f0ebe3;
+      --text2:    #b8b0a4;
+      --text3:    #7a7068;
+
+      /* Spacing & shape */
+      --r-sm:  10px;
+      --r-md:  16px;
+      --r-lg:  22px;
+      --r-xl:  28px;
+      --ring:  0 0 0 3px var(--accent);
+
+      /* Warm glow */
+      --glow-accent: 0 0 0 3px rgba(240,165,0,.25), 0 0 20px rgba(240,165,0,.08);
     }
 
-    html { font-size: 18px; }
+    html{ font-size: 17px; }
 
-    body {
+    body{
       font-family: 'Atkinson Hyperlegible', sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -35,486 +57,668 @@
       flex-direction: column;
       align-items: center;
       padding-bottom: 80px;
+      /* Subtle warm grain texture via gradient */
+      background-image:
+        radial-gradient(ellipse 80% 40% at 50% -10%, rgba(240,165,0,.06) 0%, transparent 70%);
     }
 
     /* ── SKIP LINK ── */
-    .skip-link {
-      position: absolute; top: -200px; left: 1rem;
-      background: var(--accent); color: #000;
-      padding: 0.75rem 1.25rem; border-radius: 8px;
-      font-weight: 700; font-size: 1rem;
-      z-index: 9999; transition: top 0.15s;
-      text-decoration: none;
+    .skip{
+      position:absolute; top:-200px; left:1rem;
+      background:var(--accent); color:#000;
+      padding:.75rem 1.25rem; border-radius:var(--r-sm);
+      font-weight:700; z-index:9999; text-decoration:none;
+      transition: top .15s;
     }
-    .skip-link:focus { top: 1rem; outline: 3px solid #000; }
+    .skip:focus{ top:1rem; outline:3px solid #000; }
 
     /* ── HEADER ── */
-    header {
-      width: 100%; max-width: 600px;
-      padding: 2rem 1.5rem 1rem;
+    header{
+      width:100%; max-width:560px;
+      padding: 2.5rem 1.5rem 1rem;
       text-align: center;
     }
-    .logo {
-      font-family: 'Space Mono', monospace;
-      font-size: 2.2rem; font-weight: 700;
-      color: var(--accent); letter-spacing: -1px;
-    }
-    .tagline { font-size: 0.9rem; color: var(--muted); margin-top: 0.25rem; }
 
-    /* ── VOICE STATUS ── */
-    #voice-status {
-      width: 100%; max-width: 600px;
-      padding: 0 1.25rem 0.5rem;
+    .logo-wrap{
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      margin-bottom: .35rem;
     }
-    #voice-status-inner {
+
+    .logo-icon{
+      width: 42px; height: 42px;
+      background: var(--accent);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 2px 12px rgba(240,165,0,.3);
+      flex-shrink: 0;
+    }
+
+    .logo{
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem; font-weight: 700;
+      color: var(--text);
+      letter-spacing: -1px;
+    }
+
+    .logo span{ color: var(--accent); }
+
+    .tagline{
+      font-size: .9rem;
+      color: var(--text3);
+      margin-top: .1rem;
+      letter-spacing: .02em;
+    }
+
+    /* ── VOICE BAR ── */
+    #vbar{
+      width:100%; max-width:560px;
+      padding: 0 1.25rem .85rem;
+    }
+    #vbar-inner{
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0.75rem 1.25rem;
-      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
-      font-size: 0.85rem; color: var(--muted);
+      border-radius: var(--r-md);
+      padding: .65rem 1rem;
+      display: flex; align-items: center; gap: .65rem; flex-wrap: wrap;
+      font-size: .8rem; color: var(--text3);
     }
-    #voice-name { color: var(--accent); font-weight: 700; font-size: 0.85rem; }
+    #vbar-inner label{ white-space: nowrap; font-weight: 700; color: var(--text2); }
+
+    #spd{
+      flex:1; min-width:80px;
+      appearance: none; height: 5px;
+      background: var(--border2);
+      border-radius: 999px; cursor: pointer; outline: none;
+    }
+    #spd::-webkit-slider-thumb{
+      appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent);
+      cursor: pointer;
+    }
+    #spd:focus{ box-shadow: var(--ring); border-radius: 4px; }
+    #spd-val{
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .82rem; color: var(--accent);
+      min-width: 2.8ch; font-weight: 700;
+    }
+    #voice-label{
+      color: var(--accent); font-weight: 700; font-size: .78rem;
+      margin-left: auto;
+      background: var(--accent-s);
+      padding: .2rem .6rem; border-radius: 999px;
+      border: 1px solid rgba(240,165,0,.2);
+    }
 
     /* ── MAIN ── */
-    main {
-      width: 100%; max-width: 600px;
+    main{
+      width:100%; max-width:560px;
       padding: 0 1.25rem;
-      display: flex; flex-direction: column; gap: 1.75rem;
+      display: flex; flex-direction: column; gap: 1.5rem;
     }
 
     /* ── CARD ── */
-    .card {
+    .card{
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--r-lg);
       padding: 1.5rem;
-    }
-    .card-title {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.78rem; text-transform: uppercase;
-      letter-spacing: 2px; color: var(--muted);
-      margin-bottom: 1.25rem;
+      transition: border-color .2s;
     }
 
-    /* ── INPUTS ── */
-    .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
-    .field:last-of-type { margin-bottom: 0; }
-
-    label {
-      font-size: 0.95rem; font-weight: 700; color: var(--text);
+    .card-title{
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .72rem; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--text3);
+      margin-bottom: 1.15rem;
+      display: flex; align-items: center; gap: .5rem;
     }
-
-    input[type="text"], input[type="tel"] {
-      width: 100%; padding: 0.9rem 1rem;
-      background: var(--bg); border: 2px solid var(--border);
-      border-radius: 10px; color: var(--text);
-      font-family: 'Atkinson Hyperlegible', sans-serif;
-      font-size: 1rem;
-    }
-    input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: var(--focus-ring);
+    .card-title::before{
+      content: '';
+      display: block; width: 3px; height: 14px;
+      background: var(--accent);
+      border-radius: 999px;
+      flex-shrink: 0;
     }
 
     /* ── BUTTONS ── */
-    .btn {
+    .btn{
       display: inline-flex; align-items: center; justify-content: center;
-      gap: 0.5rem; padding: 0.9rem 1.5rem; border-radius: 10px;
+      gap: .5rem; padding: .9rem 1.4rem; border-radius: var(--r-sm);
       font-family: 'Atkinson Hyperlegible', sans-serif;
-      font-size: 1rem; font-weight: 700;
-      cursor: pointer; border: 2px solid transparent;
-      text-decoration: none; transition: transform 0.1s, filter 0.15s;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      border: 2px solid transparent; text-decoration: none;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: .01em;
     }
-    .btn:focus-visible {
-      outline: none;
-      box-shadow: var(--focus-ring);
+    .btn:focus-visible{ outline: none; box-shadow: var(--glow-accent); }
+    .btn:active{ transform: scale(.97); }
+
+    .btn-primary{
+      background: var(--accent); color: #000;
+      width: 100%; font-size: 1.05rem;
+      box-shadow: 0 4px 14px rgba(240,165,0,.25);
     }
-    .btn:active { transform: scale(0.97); }
-
-    .btn-primary { background: var(--accent); color: #000; width: 100%; margin-top: 0.5rem; }
-    .btn-primary:hover { background: var(--accent2); }
-
-    .btn-ghost {
-      background: transparent;
-      border-color: var(--border); color: var(--text);
+    .btn-primary:hover{
+      background: var(--accent2);
+      box-shadow: 0 4px 18px rgba(240,165,0,.35);
     }
-    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-    .btn-call-green {
+    .btn-ghost{
+      background: var(--surface2);
+      border-color: var(--border);
+      color: var(--text2);
+    }
+    .btn-ghost:hover{ border-color: var(--accent); color: var(--accent); }
+
+    .btn-green{
       background: var(--green); color: #000;
-      width: 100%; font-size: 1.1rem; padding: 1rem;
+      width: 100%; font-size: 1.1rem; padding: 1.05rem;
+      box-shadow: 0 4px 14px rgba(74,222,128,.2);
     }
-    .btn-call-green:hover { filter: brightness(1.1); }
+    .btn-green:hover{ filter: brightness(1.08); }
+
+    .btn-red{
+      background: var(--red-s); color: var(--red);
+      border-color: rgba(248,113,113,.3);
+    }
+    .btn-red:hover{ background: var(--red); color: #fff; }
+
+    .btn-outline-y{
+      background: var(--accent-s);
+      border-color: rgba(240,165,0,.4); color: var(--accent);
+    }
+    .btn-outline-y:hover{ background: rgba(240,165,0,.2); }
+
+    /* ── FIELDS ── */
+    .field{ display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1.1rem; }
+    .field:last-of-type{ margin-bottom: 0; }
+    .field label{ font-size: .95rem; font-weight: 700; color: var(--text2); }
+    .field-hint{ font-size: .78rem; color: var(--text3); line-height: 1.5; }
+    .input-row{ display: flex; gap: .5rem; }
+
+    input[type=text], input[type=tel]{
+      flex:1; min-width:0; padding: .9rem 1.1rem;
+      background: var(--bg2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text);
+      font-family: 'Atkinson Hyperlegible', sans-serif; font-size: 1rem;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input::placeholder{ color: var(--text3); }
+    input:focus{
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(240,165,0,.18);
+    }
+
+    /* ── MIC BUTTON ── */
+    .mic-btn{
+      width: 54px; min-height: 54px; flex-shrink: 0;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.4rem;
+      transition: all .15s;
+    }
+    .mic-btn:focus-visible{ outline: none; box-shadow: var(--glow-accent); }
+    .mic-btn:hover{ border-color: var(--accent); background: var(--accent-s); }
+    .mic-btn.listening{
+      background: var(--red-s); border-color: var(--red);
+      animation: mic-pulse 1s ease-in-out infinite;
+    }
+    @keyframes mic-pulse{
+      0%,100%{ box-shadow: 0 0 0 0 rgba(248,113,113,.4); }
+      50%     { box-shadow: 0 0 0 8px rgba(248,113,113,0); }
+    }
+
+    /* ── VOICE CONTROLS ── */
+    .vc-btns{ display: flex; gap: .75rem; flex-wrap: wrap; }
+    .vc-btns .btn{ flex:1; min-width:130px; font-size:.9rem; padding:.7rem 1rem; }
 
     /* ── PROFILE VIEW ── */
-    #profile-display-name {
-      font-size: 1.15rem; font-weight: 700; margin-bottom: 0.2rem;
-    }
-    #profile-display-phone {
-      font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;
+    .profile-avatar{
+      width: 52px; height: 52px;
+      background: var(--accent-s);
+      border: 2px solid rgba(240,165,0,.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: .85rem;
     }
 
-    .profile-actions {
-      display: flex; gap: 0.75rem; flex-wrap: wrap;
+    #pname{
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--text); margin-bottom: .15rem;
     }
-    .profile-actions .btn { flex: 1; min-width: 140px; font-size: 0.9rem; padding: 0.7rem 1rem; }
+    #pphone{ font-size: .9rem; color: var(--text3); margin-bottom: 1rem; }
 
-    /* ── STATUS BADGE ── */
-    .status-badge {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.35rem 0.85rem; border-radius: 999px;
-      font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem;
+    .status-badge{
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .35rem .9rem; border-radius: 999px;
+      font-size: .82rem; font-weight: 700; margin-bottom: 1.1rem;
     }
-    .status-badge.online {
-      background: rgba(61,220,132,0.15); color: var(--green);
-      border: 1px solid rgba(61,220,132,0.3);
+    .status-badge.online{
+      background: var(--green-s); color: var(--green);
+      border: 1px solid rgba(74,222,128,.25);
     }
-    .status-badge.offline {
-      background: rgba(136,136,136,0.12); color: var(--muted);
-      border: 1px solid rgba(136,136,136,0.2);
+    .status-badge.offline{
+      background: rgba(120,110,100,.1); color: var(--text3);
+      border: 1px solid var(--border);
     }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-    .dot.pulse { animation: pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse {
-      0%,100% { opacity:1; transform:scale(1); }
-      50%      { opacity:0.4; transform:scale(0.7); }
+    .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; }
+    .dot.pulse{ animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse{
+      0%,100%{ opacity:1; transform:scale(1); }
+      50%{ opacity:.35; transform:scale(.65); }
     }
+
+    .profile-btns{ display:flex; gap:.65rem; flex-wrap:wrap; }
+    .profile-btns .btn{ flex:1; min-width:130px; font-size:.9rem; padding:.7rem 1rem; }
 
     /* ── TABS ── */
-    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
-    .tab-btn {
-      flex: 1; padding: 0.7rem; border-radius: 8px;
-      font-family: 'Atkinson Hyperlegible', sans-serif;
-      font-size: 0.95rem; font-weight: 700; cursor: pointer;
-      border: 2px solid var(--border);
-      background: transparent; color: var(--muted);
+    .tabs{
+      display: flex; gap: .4rem; margin-bottom: 1.15rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: .3rem;
     }
-    .tab-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-    .tab-btn[aria-selected="true"] {
-      background: var(--accent); color: #000; border-color: var(--accent);
+    .tab-btn{
+      flex:1; padding: .6rem .5rem; border-radius: 7px;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      font-size: .9rem; font-weight: 700; cursor: pointer;
+      border: none; background: transparent; color: var(--text3);
+      transition: all .15s;
+    }
+    .tab-btn:focus-visible{ outline: none; box-shadow: var(--ring); }
+    .tab-btn[aria-selected="true"]{
+      background: var(--surface2);
+      color: var(--accent);
+      box-shadow: 0 1px 4px rgba(0,0,0,.3);
     }
 
     /* ── USER LIST ── */
-    .user-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .user-list{ display:flex; flex-direction:column; gap:.6rem; }
 
-    .user-item {
+    .user-item{
       display: flex; align-items: center;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1rem 1.25rem; gap: 1rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: .9rem 1rem; gap: .85rem;
+      transition: border-color .15s;
     }
+    .user-item:hover{ border-color: var(--border2); }
 
-    .user-info { flex: 1; min-width: 0; }
-    .user-name { font-weight: 700; font-size: 1rem; }
-    .user-status { font-size: 0.82rem; margin-top: 0.2rem; }
-
-    .user-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
-
-    .icon-btn {
-      width: 54px; height: 54px; border-radius: 10px;
+    .user-avatar{
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
       display: flex; align-items: center; justify-content: center;
-      border: 2px solid transparent; cursor: pointer; background: none;
-      font-size: 1.4rem;
-    }
-    .icon-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-    .icon-btn:active { transform: scale(0.93); }
-
-    .icon-btn.call-btn { background: var(--green); color: #000; }
-    .icon-btn.call-btn:hover { filter: brightness(1.1); }
-
-    .icon-btn.fav-btn {
-      background: var(--surface); border-color: var(--border); color: var(--accent);
-    }
-    .icon-btn.fav-btn:hover { border-color: var(--accent); }
-    .icon-btn.fav-btn[aria-pressed="true"] { background: var(--accent); color: #000; }
-
-    .empty {
-      text-align: center; color: var(--muted);
-      padding: 2rem 1rem; font-size: 0.95rem; line-height: 1.7;
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--accent);
+      font-family: 'Space Grotesk', sans-serif;
     }
 
-    /* ── VOICE CONTROLS CARD ── */
-    #voice-card .voice-row {
-      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
-      margin-bottom: 0.75rem;
+    .user-info{ flex:1; min-width:0; }
+    .user-name{ font-weight:700; font-size:1rem; color: var(--text); }
+    .user-status{ font-size:.8rem; margin-top:.2rem; display:flex; align-items:center; gap:.35rem; }
+
+    .status-dot{
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink:0;
+      background: var(--text3);
     }
-    #voice-card label { font-size: 0.9rem; white-space: nowrap; }
-    #tts-speed {
-      flex: 1; min-width: 80px;
-      accent-color: var(--accent); cursor: pointer; height: 6px;
-    }
-    #tts-speed:focus { outline: 3px solid var(--accent); border-radius: 4px; }
-    #tts-speed-val {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.85rem; color: var(--accent); min-width: 3ch;
+    .status-dot.on{
+      background: var(--green);
+      box-shadow: 0 0 0 3px rgba(74,222,128,.2);
+      animation: pulse 2s ease-in-out infinite;
     }
 
-    .voice-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-    .voice-btns .btn { flex: 1; min-width: 120px; font-size: 0.9rem; padding: 0.7rem 1rem; }
+    .user-actions{ display:flex; gap:.45rem; flex-shrink:0; }
 
-    .btn-stop { background: var(--red); color: #fff; border-color: var(--red); }
-    .btn-stop:hover { filter: brightness(1.1); }
+    .icon-btn{
+      width: 48px; height: 48px; border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid transparent; cursor: pointer; background: none;
+      font-size: 1.25rem; transition: all .15s;
+    }
+    .icon-btn:focus-visible{ outline:none; box-shadow: var(--glow-accent); }
+    .icon-btn:active{ transform: scale(.92); }
 
-    .btn-help { border-color: var(--accent); color: var(--accent); }
-    .btn-help:hover { background: rgba(245,200,66,0.1); }
+    .icon-btn.call-btn{
+      background: var(--green-s);
+      border-color: rgba(74,222,128,.3);
+      color: var(--green);
+    }
+    .icon-btn.call-btn:hover{
+      background: var(--green); color: #000;
+      box-shadow: 0 3px 12px rgba(74,222,128,.3);
+    }
 
-    /* ── MODAL ── */
-    .modal-backdrop {
+    .icon-btn.fav-btn{
+      background: var(--surface2);
+      border-color: var(--border); color: var(--text3);
+    }
+    .icon-btn.fav-btn:hover{ border-color: var(--accent); color: var(--accent); }
+    .icon-btn.fav-btn[aria-pressed="true"]{
+      background: var(--accent-s);
+      border-color: rgba(240,165,0,.4);
+      color: var(--accent);
+    }
+
+    .empty{
+      text-align: center; color: var(--text3);
+      padding: 2.5rem 1rem; font-size: .95rem; line-height: 1.75;
+    }
+    .empty-icon{ font-size: 2.5rem; display:block; margin-bottom:.75rem; opacity:.5; }
+
+    /* ── MODALS ── */
+    .modal-backdrop{
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.9);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 200; padding: 1.5rem;
+      background: rgba(10,8,6,.88);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: flex-end;
+      justify-content: center;
+      z-index: 200; padding: 0;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.2s;
+      transition: opacity .25s;
     }
-    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .modal-backdrop.open{ opacity:1; pointer-events:all; }
 
-    .modal {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 2rem;
-      max-width: 460px; width: 100%;
-      transform: translateY(16px); transition: transform 0.2s;
-      max-height: 90vh; overflow-y: auto;
+    .modal{
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-bottom: none;
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 1rem 1.75rem 2.25rem;
+      width: 100%; max-width: 560px;
+      transform: translateY(100%);
+      transition: transform .3s cubic-bezier(.32,.72,0,1);
+      max-height: 92vh; overflow-y: auto;
     }
-    .modal-backdrop.open .modal { transform: translateY(0); }
+    .modal-backdrop.open .modal{ transform: translateY(0); }
+
+    /* drag handle */
+    .modal::before{
+      content: '';
+      display: block; width: 40px; height: 4px;
+      background: var(--border2); border-radius: 999px;
+      margin: .6rem auto 1.25rem;
+    }
 
     /* ── CALL MODAL ── */
-    #call-modal .modal { text-align: center; }
-    .modal-icon { font-size: 3rem; margin-bottom: 1rem; }
-    .modal-caller {
-      font-family: 'Space Mono', monospace;
+    #call-modal .modal{ text-align:center; }
+
+    .caller-avatar{
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--accent-s);
+      border: 2px solid rgba(240,165,0,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin: 0 auto 1rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; color: var(--accent);
+      box-shadow: 0 0 0 8px rgba(240,165,0,.06), 0 0 0 16px rgba(240,165,0,.03);
+    }
+
+    .m-name{
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 1.5rem; font-weight: 700;
-      color: var(--accent); margin-bottom: 0.5rem;
+      color: var(--text); margin-bottom: .4rem;
     }
-    .modal-question {
-      color: var(--muted); font-size: 1rem;
-      margin-bottom: 1.75rem; line-height: 1.6;
+    .m-q{
+      color: var(--text2); font-size: .95rem;
+      margin-bottom: 1.75rem; line-height: 1.65;
     }
-    .modal-call-actions { display: flex; gap: 0.75rem; }
-    .modal-call-actions .btn { flex: 1; }
+    .m-actions{ display:flex; gap:.75rem; }
+    .m-actions .btn{ flex:1; }
 
     /* ── TUTORIAL MODAL ── */
-    #tutorial-modal .modal { text-align: left; max-width: 520px; }
-
-    .tutorial-step {
-      display: flex; gap: 1rem; align-items: flex-start;
-      padding: 0.9rem 0; border-bottom: 1px solid var(--border);
+    #tut-modal .modal{ text-align:left; }
+    #tut-modal .modal-title{
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--text); margin-bottom: 1.25rem;
+      text-align: center;
     }
-    .tutorial-step:last-of-type { border-bottom: none; }
 
-    .step-num {
-      font-family: 'Space Mono', monospace;
-      font-size: 1.1rem; font-weight: 700;
-      color: var(--accent); min-width: 26px; padding-top: 0.1rem;
+    .tut-step{
+      display: flex; gap: .9rem; align-items: flex-start;
+      padding: .85rem 0; border-bottom: 1px solid var(--border);
     }
-    .step-text { font-size: 0.95rem; line-height: 1.65; }
-    .step-text strong { color: var(--accent); }
+    .tut-step:last-of-type{ border-bottom:none; }
 
-    .tutorial-btns { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
-    .tutorial-btns .btn { flex: 1; min-width: 130px; }
+    .tut-num{
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink:0;
+      background: var(--accent-s); border: 1px solid rgba(240,165,0,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .82rem; font-weight: 700; color: var(--accent);
+      margin-top: .1rem;
+    }
+
+    .tut-text{ font-size: .93rem; line-height: 1.65; color: var(--text2); }
+    .tut-text strong{ color: var(--text); }
+
+    .tut-btns{ display:flex; gap:.75rem; margin-top:1.5rem; flex-wrap:wrap; }
+    .tut-btns .btn{ flex:1; min-width:130px; }
+
+    /* ── MIC MODAL ── */
+    #mic-modal .modal{ text-align:center; }
+    #mic-title{
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--text); margin-bottom: .85rem;
+    }
+
+    .mic-orb{
+      width: 80px; height: 80px; border-radius: 50%;
+      background: var(--red-s); border: 2px solid rgba(248,113,113,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin: 0 auto .85rem;
+      transition: all .3s;
+    }
+    .mic-orb.active{
+      background: var(--red);
+      box-shadow: 0 0 0 8px rgba(248,113,113,.12), 0 0 0 16px rgba(248,113,113,.06);
+      animation: orb-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes orb-pulse{
+      0%,100%{ box-shadow: 0 0 0 8px rgba(248,113,113,.12), 0 0 0 16px rgba(248,113,113,.06); }
+      50%     { box-shadow: 0 0 0 14px rgba(248,113,113,.08), 0 0 0 26px rgba(248,113,113,.03); }
+    }
+
+    #mic-status{
+      font-size: .95rem; color: var(--text2);
+      margin-bottom: .75rem; font-weight: 700; min-height: 1.4rem;
+    }
+    #mic-transcript{
+      background: var(--bg2); border: 1.5px solid var(--border);
+      border-radius: var(--r-sm); padding: .9rem 1rem;
+      font-size: 1rem; min-height: 56px; line-height: 1.6;
+      text-align: left; margin-bottom: 1.25rem;
+      color: var(--text); font-style: italic;
+    }
 
     /* ── SPEAKING INDICATOR ── */
-    #speaking-dot {
-      position: fixed; bottom: 1.25rem; right: 1.25rem;
-      background: var(--accent); color: #000;
-      border-radius: 999px; padding: 0.45rem 1rem;
-      font-size: 0.82rem; font-weight: 700;
-      display: flex; align-items: center; gap: 0.5rem;
-      opacity: 0; transform: translateY(8px);
-      transition: opacity 0.25s, transform 0.25s;
+    #sdot{
+      position: fixed; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 999px; padding: .5rem 1.1rem;
+      font-size: .82rem; font-weight: 700; color: var(--accent);
+      display: flex; align-items: center; gap: .5rem;
+      transition: transform .3s cubic-bezier(.32,.72,0,1);
       pointer-events: none; z-index: 400;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
     }
-    #speaking-dot.on { opacity: 1; transform: translateY(0); }
-    .wave { display: flex; gap: 2px; align-items: center; }
-    .wave span {
-      display: block; width: 3px; background: #000; border-radius: 3px;
-      animation: wv 0.75s ease-in-out infinite;
+    #sdot.on{ transform: translateX(-50%) translateY(0); }
+
+    .wave{ display:flex; gap:3px; align-items:center; }
+    .wave span{
+      display:block; width:3px; background:var(--accent);
+      border-radius:999px; animation:wv .75s ease-in-out infinite;
     }
-    .wave span:nth-child(1) { height:8px;  animation-delay:0s; }
-    .wave span:nth-child(2) { height:14px; animation-delay:0.15s; }
-    .wave span:nth-child(3) { height:8px;  animation-delay:0.3s; }
-    @keyframes wv {
-      0%,100% { transform:scaleY(1); }
-      50%      { transform:scaleY(0.35); }
-    }
+    .wave span:nth-child(1){ height:7px;  animation-delay:0s; }
+    .wave span:nth-child(2){ height:13px; animation-delay:.15s; }
+    .wave span:nth-child(3){ height:7px;  animation-delay:.3s; }
+    @keyframes wv{ 0%,100%{ transform:scaleY(1); } 50%{ transform:scaleY(.3); } }
 
     /* ── TOAST ── */
-    #toast {
-      position: fixed; bottom: 4.5rem; left: 50%;
+    #toast{
+      position: fixed; bottom: 4rem; left: 50%;
       transform: translateX(-50%) translateY(60px);
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); padding: 0.7rem 1.5rem;
-      border-radius: 999px; font-size: 0.9rem; font-weight: 700;
-      z-index: 300; transition: transform 0.3s;
-      white-space: nowrap; pointer-events: none;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text); padding: .65rem 1.25rem;
+      border-radius: 999px; font-size: .88rem; font-weight: 700;
+      z-index: 300; transition: transform .3s; white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.35);
     }
-    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.show{ transform: translateX(-50%) translateY(0); }
 
     /* ── ARIA LIVE ── */
-    #ar {
-      position: absolute; width:1px; height:1px;
-      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap;
+    #ar{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+
+    /* ── SECTION DIVIDER ── */
+    .divider{
+      display: flex; align-items: center; gap: .75rem;
+      color: var(--text3); font-size: .78rem; letter-spacing: .08em;
+      text-transform: uppercase; margin: .25rem 0;
+    }
+    .divider::before,.divider::after{
+      content:''; flex:1; height:1px; background: var(--border);
     }
 
-    @media (max-width:420px) {
-      html { font-size: 16px; }
-      .modal-call-actions, .tutorial-btns { flex-direction: column; }
+    @media(max-width:420px){
+      html{ font-size:16px; }
+      .m-actions,.tut-btns{ flex-direction:column; }
+      .modal{ padding:1rem 1.25rem 2rem; }
     }
   </style>
 </head>
 <body>
 
-<!-- Skip link — primul element Tab -->
-<a class="skip-link" href="#main" tabindex="1">Sari direct la conținut</a>
-
-<!-- Aria live region pentru screen readere -->
+<a class="skip" href="#main">Sari la conținut principal</a>
 <div id="ar" role="status" aria-live="polite" aria-atomic="true"></div>
 
-<!-- ══ HEADER ══ -->
+<!-- ── HEADER ── -->
 <header>
-  <div class="logo" aria-label="Blinder">Blinder</div>
-  <p class="tagline">Conectează-te cu vocea</p>
+  <div class="logo-wrap">
+    <div class="logo-icon" aria-hidden="true">👁️</div>
+    <div class="logo">Blin<span>der</span></div>
+  </div>
+  <p class="tagline">Conectează-te cu vocea · pentru tine</p>
 </header>
 
-<!-- ══ VOICE STATUS BAR ══ -->
-<div id="voice-status" aria-live="polite">
-  <div id="voice-status-inner">
-    <span aria-hidden="true">🔊</span>
-    <span>Voce activă:</span>
-    <span id="voice-name">Se caută...</span>
-    <span id="voice-lang" style="color:var(--muted);font-size:0.8rem;"></span>
+<!-- ── VOICE BAR ── -->
+<div id="vbar">
+  <div id="vbar-inner">
+    <label for="spd">🔊 Viteză:</label>
+    <input type="range" id="spd" min=".5" max="2" step=".1" value="1"
+      aria-label="Viteză voce, curent normală"/>
+    <span id="spd-val" aria-hidden="true">1×</span>
+    <span id="voice-label">—</span>
   </div>
 </div>
 
-<!-- ══ MAIN ══ -->
+<!-- ── MAIN ── -->
 <main id="main">
 
-  <!-- ══ 1. CONTROALE VOCE — primul în Tab order ══ -->
-  <section class="card" id="voice-card" aria-labelledby="voice-card-title">
-    <div class="card-title" id="voice-card-title">Controale voce</div>
-
-    <div class="voice-row">
-      <label for="tts-speed">Viteză:</label>
-      <input
-        type="range" id="tts-speed"
-        min="0.5" max="2" step="0.1" value="1"
-        aria-label="Viteză voce, curent: 1 ori normal"
-        aria-valuemin="0.5" aria-valuemax="2" aria-valuenow="1"
-        tabindex="2"
-      />
-      <span id="tts-speed-val" aria-hidden="true">1×</span>
-    </div>
-
-    <div class="voice-btns">
-      <button class="btn btn-stop" tabindex="3"
-        onclick="stopSpeech()"
-        onfocus="speakFocus('Buton Oprește vocea')"
+  <!-- ① CONTROALE VOCE -->
+  <section class="card" aria-labelledby="vc-h">
+    <div class="card-title" id="vc-h">Controale voce</div>
+    <div class="vc-btns">
+      <button class="btn btn-red" id="stop-btn"
         aria-label="Oprește vocea acum">
         ⏹ Oprește vocea
       </button>
-      <button class="btn btn-ghost btn-help" tabindex="4"
-        onclick="openTutorial(false)"
-        onfocus="speakFocus('Buton Cum funcționează, apasă Enter pentru tutorial')"
-        aria-label="Cum funcționează — deschide tutorialul audio">
+      <button class="btn btn-outline-y" id="help-btn"
+        aria-label="Deschide tutorialul audio — cum funcționează aplicația">
         ❓ Cum funcționează?
       </button>
     </div>
   </section>
 
-  <!-- ══ 2. PROFIL ══ -->
-  <section class="card" id="profile-section" aria-labelledby="profile-title">
-    <div class="card-title" id="profile-title">Profilul tău</div>
+  <!-- ② PROFIL -->
+  <section class="card" aria-labelledby="prof-h">
+    <div class="card-title" id="prof-h">Profilul tău</div>
 
-    <!-- FORMULAR (vizibil la start) -->
-    <div id="profile-form" aria-label="Formular creare profil">
+    <!-- FORMULAR -->
+    <div id="profile-form">
       <div class="field">
-        <label for="input-name">Nume sau pseudonim</label>
-        <input
-          type="text" id="input-name"
-          placeholder="Ex: Maria sau Anonim"
-          autocomplete="nickname"
-          aria-required="true"
-          aria-describedby="name-hint"
-          maxlength="30"
-          tabindex="5"
-          onfocus="speakFocus('Câmpul Nume sau pseudonim. Introdu cum vrei să fii văzut de alții.')"
-        />
-        <span id="name-hint" style="font-size:0.8rem;color:var(--muted);">Poți folosi un pseudonim dacă preferi anonimatul.</span>
+        <label for="inp-name">Nume sau pseudonim</label>
+        <div class="input-row">
+          <input type="text" id="inp-name"
+            placeholder="Ex: Maria sau Anonim"
+            autocomplete="nickname"
+            aria-required="true"
+            aria-describedby="hint-name"
+            maxlength="30"/>
+          <button class="mic-btn" id="mic-name-btn"
+            aria-label="Dictează numele cu microfonul. Apasă și vorbește.">🎤</button>
+        </div>
+        <span id="hint-name" class="field-hint">Poți folosi un pseudonim. Apasă 🎤 pentru a dicta cu vocea.</span>
       </div>
 
       <div class="field">
-        <label for="input-phone">Numărul tău de telefon</label>
-        <input
-          type="tel" id="input-phone"
-          placeholder="+40 7XX XXX XXX"
-          autocomplete="tel"
-          aria-required="true"
-          aria-describedby="phone-hint"
-          inputmode="tel"
-          tabindex="6"
-          onfocus="speakFocus('Câmpul Număr de telefon. Introdu numărul cu prefixul țării, de exemplu plus 40.')"
-        />
-        <span id="phone-hint" style="font-size:0.8rem;color:var(--muted);">Exemplu: plus 40 7XX XXX XXX</span>
+        <label for="inp-phone">Numărul tău de telefon</label>
+        <div class="input-row">
+          <input type="tel" id="inp-phone"
+            placeholder="+40 7XX XXX XXX"
+            autocomplete="tel"
+            aria-required="true"
+            aria-describedby="hint-phone"
+            inputmode="tel"/>
+          <button class="mic-btn" id="mic-phone-btn"
+            aria-label="Dictează numărul de telefon cu microfonul. Apasă și vorbește.">🎤</button>
+        </div>
+        <span id="hint-phone" class="field-hint">Exemplu: plus 40 urmat de numărul. Apasă 🎤 pentru a dicta.</span>
       </div>
 
       <button class="btn btn-primary" id="save-btn"
-        tabindex="7"
-        aria-label="Salvează profilul și intră în aplicație"
-        onfocus="speakFocus('Buton Intră în aplicație. Apasă Enter pentru a salva profilul.')"
-        onclick="saveProfile()">
+        aria-label="Salvează profilul și intră în aplicație">
         📲 Intră în aplicație
       </button>
     </div>
 
-    <!-- PROFIL SALVAT (ascuns la start) -->
-    <div id="profile-view" hidden aria-label="Profilul salvat">
-      <div id="profile-display-name" aria-live="polite"></div>
-      <div id="profile-display-phone"></div>
-
-      <div id="status-badge" class="status-badge offline"
-        role="status" aria-label="Ești offline">
+    <!-- PROFIL SALVAT -->
+    <div id="profile-view" hidden>
+      <div class="profile-avatar" id="profile-avatar" aria-hidden="true">🙂</div>
+      <div id="pname"></div>
+      <div id="pphone"></div>
+      <div id="status-badge" class="status-badge offline" role="status">
         <span class="dot" aria-hidden="true"></span>
         <span id="status-label">Offline</span>
       </div>
-
-      <div class="profile-actions">
-        <button class="btn btn-ghost" id="toggle-status-btn"
-          tabindex="8"
-          aria-label="Arată-mă disponibil pentru apeluri"
-          onfocus="speakFocus('Buton schimbare status. Apasă Enter pentru a deveni disponibil sau offline.')"
-          onclick="toggleStatus()">
-          🟢 Arată-mă disponibil
-        </button>
-        <button class="btn btn-ghost" id="edit-btn"
-          tabindex="9"
-          aria-label="Editează profilul — schimbă numele sau numărul"
-          onfocus="speakFocus('Buton Editează profilul.')"
-          onclick="editProfile()">
-          ✏️ Editează
-        </button>
+      <div class="profile-btns">
+        <button class="btn btn-ghost" id="toggle-btn">🟢 Arată-mă disponibil</button>
+        <button class="btn btn-ghost" id="edit-btn">✏️ Editează</button>
       </div>
     </div>
   </section>
 
-  <!-- ══ 3. CONTACTE ══ -->
-  <section class="card" id="contacts-section" aria-labelledby="contacts-title" hidden>
-    <div class="card-title" id="contacts-title">Contacte</div>
+  <!-- ③ CONTACTE -->
+  <section class="card" id="contacts-section" hidden aria-labelledby="cont-h">
+    <div class="card-title" id="cont-h">Contacte</div>
 
-    <!-- TABS -->
-    <div class="tabs" role="tablist" aria-label="Alege secțiunea de contacte">
-      <button class="tab-btn" role="tab"
-        id="tab-online" aria-selected="true" aria-controls="panel-online"
-        tabindex="10"
-        onfocus="speakFocus('Tab Online acum — persoane disponibile pentru apel')"
-        onclick="switchTab('online')">
+    <div class="tabs" role="tablist" aria-label="Secțiuni contacte">
+      <button class="tab-btn" role="tab" id="tab-online"
+        aria-selected="true" aria-controls="panel-online">
         🟢 Online acum
       </button>
-      <button class="tab-btn" role="tab"
-        id="tab-fav" aria-selected="false" aria-controls="panel-fav"
-        tabindex="11"
-        onfocus="speakFocus('Tab Favoriți — contactele tale salvate')"
-        onclick="switchTab('fav')">
+      <button class="tab-btn" role="tab" id="tab-fav"
+        aria-selected="false" aria-controls="panel-fav">
         ⭐ Favoriți
       </button>
     </div>
@@ -522,7 +726,6 @@
     <div id="panel-online" role="tabpanel" aria-labelledby="tab-online">
       <div id="online-list" class="user-list"></div>
     </div>
-
     <div id="panel-fav" role="tabpanel" aria-labelledby="tab-fav" hidden>
       <div id="fav-list" class="user-list"></div>
     </div>
@@ -530,206 +733,174 @@
 
 </main>
 
-<!-- ══ MODAL: CONFIRMARE APEL ══ -->
+<!-- ── MODAL: APEL ── -->
 <div class="modal-backdrop" id="call-modal"
   role="dialog" aria-modal="true"
-  aria-labelledby="call-modal-title"
-  aria-describedby="call-modal-question">
-
+  aria-labelledby="cm-name" aria-describedby="cm-q">
   <div class="modal">
-    <div class="modal-icon" aria-hidden="true">📞</div>
-    <div class="modal-caller" id="call-modal-title"></div>
-    <div class="modal-question" id="call-modal-question"></div>
-    <div class="modal-call-actions">
+    <div class="caller-avatar" id="cm-avatar" aria-hidden="true">?</div>
+    <div class="m-name" id="cm-name"></div>
+    <div class="m-q" id="cm-q"></div>
+    <div class="m-actions">
       <button class="btn btn-ghost" id="call-cancel"
-        aria-label="Anulează apelul"
-        onclick="closeCallModal()">
-        ✕ Anulează
-      </button>
-      <a class="btn btn-call-green" id="call-confirm"
-        href="#" role="button"
-        aria-label="Confirmă și sună">
-        📞 Sună acum
-      </a>
+        aria-label="Anulează apelul">✕ Anulează</button>
+      <a class="btn btn-green" id="call-confirm"
+        href="#" role="button">📞 Sună acum</a>
     </div>
   </div>
 </div>
 
-<!-- ══ MODAL: TUTORIAL ══ -->
-<div class="modal-backdrop" id="tutorial-modal"
-  role="dialog" aria-modal="true"
-  aria-labelledby="tutorial-title">
-
+<!-- ── MODAL: TUTORIAL ── -->
+<div class="modal-backdrop" id="tut-modal"
+  role="dialog" aria-modal="true" aria-labelledby="tut-h">
   <div class="modal">
-    <div style="text-align:center;font-size:3rem;margin-bottom:1rem;" aria-hidden="true">🎧</div>
-    <h2 id="tutorial-title"
-      style="font-family:'Space Mono',monospace;color:var(--accent);
-             margin-bottom:1.25rem;font-size:1.1rem;text-align:center;">
-      Cum funcționează Blinder
-    </h2>
+    <p class="modal-title" id="tut-h">🎧 Cum funcționează Blinder</p>
 
-    <div class="tutorial-step">
-      <span class="step-num" aria-hidden="true">1</span>
-      <div class="step-text"><strong>Profilul tău</strong> — Introdu numele și numărul de telefon. Poți folosi un pseudonim.</div>
+    <div class="tut-step">
+      <div class="tut-num" aria-hidden="true">1</div>
+      <div class="tut-text"><strong>Profilul tău</strong> — Introdu numele și telefonul. Apasă 🎤 lângă orice câmp pentru a dicta cu vocea.</div>
     </div>
-    <div class="tutorial-step">
-      <span class="step-num" aria-hidden="true">2</span>
-      <div class="step-text"><strong>Disponibilitate</strong> — Apasă „Arată-mă disponibil" ca alți utilizatori să te poată suna.</div>
+    <div class="tut-step">
+      <div class="tut-num" aria-hidden="true">2</div>
+      <div class="tut-text"><strong>Disponibilitate</strong> — Apasă „Arată-mă disponibil" ca alții să te poată suna.</div>
     </div>
-    <div class="tutorial-step">
-      <span class="step-num" aria-hidden="true">3</span>
-      <div class="step-text"><strong>Sună pe cineva</strong> — În „Online acum" găsești persoanele disponibile. Apasă butonul 📞 de lângă un nume.</div>
+    <div class="tut-step">
+      <div class="tut-num" aria-hidden="true">3</div>
+      <div class="tut-text"><strong>Sună pe cineva</strong> — În „Online acum" apasă 📞 de lângă un nume.</div>
     </div>
-    <div class="tutorial-step">
-      <span class="step-num" aria-hidden="true">4</span>
-      <div class="step-text"><strong>Confirmare apel</strong> — Apare un dialog: apasă „Sună acum" sau „Anulează".</div>
+    <div class="tut-step">
+      <div class="tut-num" aria-hidden="true">4</div>
+      <div class="tut-text"><strong>Confirmare apel</strong> — Apare un dialog: „Sună acum" sau „Anulează".</div>
     </div>
-    <div class="tutorial-step">
-      <span class="step-num" aria-hidden="true">5</span>
-      <div class="step-text"><strong>Favoriți</strong> — Apasă ⭐ lângă un utilizator pentru a-l salva. Îi găsești în tabul „Favoriți".</div>
+    <div class="tut-step">
+      <div class="tut-num" aria-hidden="true">5</div>
+      <div class="tut-text"><strong>Favoriți</strong> — Apasă ⭐ lângă un utilizator pentru a-l salva.</div>
     </div>
-    <div class="tutorial-step">
-      <span class="step-num" aria-hidden="true">6</span>
-      <div class="step-text"><strong>Vocea aplicației</strong> — Totul se citește cu voce tare. Schimbă viteza sau apasă „Oprește vocea" oricând.</div>
+    <div class="tut-step">
+      <div class="tut-num" aria-hidden="true">6</div>
+      <div class="tut-text"><strong>Vocea aplicației</strong> — Totul se citește cu voce tare. Schimbă viteza sau apasă „Oprește vocea".</div>
     </div>
-    <div class="tutorial-step">
-      <span class="step-num" aria-hidden="true">7</span>
-      <div class="step-text"><strong>Navigare cu Tab</strong> — Apasă tasta Tab pentru a trece la elementul următor. Enter activează butoanele. Escape închide orice dialog.</div>
+    <div class="tut-step">
+      <div class="tut-num" aria-hidden="true">7</div>
+      <div class="tut-text"><strong>Navigare Tab</strong> — Tab = element următor. Enter = activează. Escape = închide dialog.</div>
     </div>
 
-    <div class="tutorial-btns">
-      <button class="btn btn-primary" id="read-aloud-btn"
-        aria-label="Citește tutorialul cu voce tare"
-        onclick="readTutorialAloud()">
-        🔊 Citește cu voce tare
-      </button>
-      <button class="btn btn-ghost"
-        aria-label="Închide tutorialul"
-        onclick="closeTutorial()">
-        ✓ Am înțeles
-      </button>
+    <div class="tut-btns">
+      <button class="btn btn-primary" id="tut-read-btn"
+        aria-label="Citește tutorialul cu voce tare de la capăt">🔊 Citește cu voce tare</button>
+      <button class="btn btn-ghost" id="tut-close-btn"
+        aria-label="Închide tutorialul">✓ Am înțeles</button>
     </div>
   </div>
 </div>
 
-<!-- ══ SPEAKING INDICATOR ══ -->
-<div id="speaking-dot" aria-hidden="true">
+<!-- ── MODAL: MIC ── -->
+<div class="modal-backdrop" id="mic-modal"
+  role="dialog" aria-modal="true"
+  aria-labelledby="mic-title" aria-describedby="mic-status">
+  <div class="modal">
+    <div id="mic-title"></div>
+    <div class="mic-orb" id="mic-orb" aria-hidden="true">🎤</div>
+    <div id="mic-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div id="mic-transcript" aria-live="polite" aria-atomic="true" aria-label="Text recunoscut">
+      <span style="color:var(--text3)">Textul dictat va apărea aici...</span>
+    </div>
+    <div class="m-actions">
+      <button class="btn btn-ghost" id="mic-cancel-btn"
+        aria-label="Anulează dictarea">✕ Anulează</button>
+      <button class="btn btn-primary" id="mic-accept-btn"
+        aria-label="Acceptă textul și închide">✓ Acceptă</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SPEAKING INDICATOR ── -->
+<div id="sdot" aria-hidden="true">
   <div class="wave"><span></span><span></span><span></span></div>
   <span>Vorbesc...</span>
 </div>
 
-<!-- ══ TOAST ══ -->
 <div id="toast" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
-<!-- ══════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════ -->
 <script>
-// ─────────────────────────────────────────
-//  TTS ENGINE
-// ─────────────────────────────────────────
-const synth = window.speechSynthesis;
-let ttsVoice    = null;
-let ttsRate     = 1.0;
-let speechQ     = [];
-let ttsRunning  = false;
-let userReady   = false;   // browser requires user gesture before speech
-let focusCooldown = false; // prevent double-speak on click+focus
+// ═══════════════════════════════════════════════════
+//  TTS — robust queue, one utterance at a time
+// ═══════════════════════════════════════════════════
+const SYN = window.speechSynthesis;
+let _voice  = null;
+let _rate   = 1.0;
+let _q      = [];
+let _busy   = false;
+let _ready  = false;
 
-// Find best Romanian voice
-function pickVoice() {
-  const all = synth.getVoices();
+function _pickVoice() {
+  const all = SYN.getVoices();
   if (!all.length) return;
+  _voice =
+    all.find(v => v.lang === 'ro-RO' && v.localService) ||
+    all.find(v => v.lang === 'ro-RO') ||
+    all.find(v => v.lang.startsWith('ro')) ||
+    all.find(v => v.default) || all[0] || null;
+  document.getElementById('voice-label').textContent =
+    _voice ? '🗣 ' + _voice.name.split(' ')[0] : '🗣 implicită';
+}
+if (SYN.getVoices().length) _pickVoice();
+SYN.addEventListener('voiceschanged', _pickVoice);
 
-  // Priority list for Romanian on Windows/Chrome/Edge/Firefox
-  const roVoice =
-    all.find(v => v.lang === 'ro-RO' && v.localService) ||   // local Romanian
-    all.find(v => v.lang === 'ro-RO') ||                     // remote Romanian
-    all.find(v => v.lang.startsWith('ro')) ||                // any Romanian
-    all.find(v => v.default) ||
-    all[0];
-
-  ttsVoice = roVoice || null;
-
-  // Update UI
-  if (ttsVoice) {
-    document.getElementById('voice-name').textContent = ttsVoice.name;
-    document.getElementById('voice-lang').textContent = `(${ttsVoice.lang})`;
-  } else {
-    document.getElementById('voice-name').textContent = 'Voce implicită';
-  }
+function speak(text, priority) {
+  if (!SYN) return;
+  if (priority) { SYN.cancel(); _q = []; _busy = false; }
+  _q.push(String(text));
+  _drain();
 }
 
-// Voices load async — listen for both immediate and async
-if (synth.getVoices().length) pickVoice();
-synth.addEventListener('voiceschanged', pickVoice);
+function _drain() {
+  if (_busy || !_q.length || !_ready) return;
+  _busy = true;
+  document.getElementById('sdot').classList.add('on');
 
-function speak(text, priority = false) {
-  if (!synth) return;
-  if (priority) { synth.cancel(); speechQ = []; ttsRunning = false; }
-  speechQ.push(text);
-  if (!ttsRunning) drainQueue();
-}
+  const utt = new SpeechSynthesisUtterance(_q.shift());
+  utt.lang  = 'ro-RO';
+  utt.rate  = _rate;
+  if (_voice) utt.voice = _voice;
 
-function drainQueue() {
-  if (!speechQ.length || !userReady) {
-    ttsRunning = false;
-    document.getElementById('speaking-dot').classList.remove('on');
-    return;
-  }
-  ttsRunning = true;
-  document.getElementById('speaking-dot').classList.add('on');
-
-  const utt  = new SpeechSynthesisUtterance(speechQ.shift());
-  utt.lang   = 'ro-RO';
-  utt.rate   = ttsRate;
-  if (ttsVoice) utt.voice = ttsVoice;
-
-  utt.onend   = () => { ttsRunning = false; drainQueue(); };
-  utt.onerror = (e) => {
-    // Ignore 'interrupted' — it's from our own cancel()
-    if (e.error !== 'interrupted') console.warn('TTS error:', e.error);
-    ttsRunning = false;
-    drainQueue();
+  utt.onend = () => {
+    _busy = false;
+    if (_q.length) setTimeout(_drain, 80);
+    else document.getElementById('sdot').classList.remove('on');
   };
-
-  synth.speak(utt);
+  utt.onerror = (e) => {
+    if (e.error !== 'interrupted') console.warn('TTS:', e.error);
+    _busy = false;
+    if (_q.length) setTimeout(_drain, 80);
+    else document.getElementById('sdot').classList.remove('on');
+  };
+  SYN.speak(utt);
 }
 
 function stopSpeech() {
-  synth.cancel();
-  speechQ    = [];
-  ttsRunning = false;
-  document.getElementById('speaking-dot').classList.remove('on');
-  // Don't speak after stop — user wants silence
+  SYN.cancel(); _q = []; _busy = false;
+  document.getElementById('sdot').classList.remove('on');
 }
 
-// Called on every focus event for interactive elements
-// Cooldown prevents double-speak when user clicks (triggers both focus & click)
-function speakFocus(text) {
-  if (focusCooldown) return;
-  speak(text, true);
-}
+// ═══════════════════════════════════════════════════
+//  FOCUS ANNOUNCE — keyboard only, not on click
+// ═══════════════════════════════════════════════════
+let _ptr = false;
+document.addEventListener('mousedown',  () => { _ptr = true; });
+document.addEventListener('touchstart', () => { _ptr = true; }, { passive: true });
+document.addEventListener('mouseup',    () => { setTimeout(() => { _ptr = false; }, 200); });
+document.addEventListener('touchend',   () => { setTimeout(() => { _ptr = false; }, 200); });
 
-function setFocusCooldown() {
-  focusCooldown = true;
-  setTimeout(() => { focusCooldown = false; }, 300);
-}
+document.addEventListener('focusin', (e) => {
+  if (_ptr) return;
+  const msg = e.target.dataset.speak || e.target.getAttribute('aria-label') || '';
+  if (msg) speak(msg, true);
+});
 
-// Speed control
-function updateSpeed(val) {
-  ttsRate = parseFloat(val);
-  const display = ttsRate === 1 ? 'normal' : `${ttsRate} ori`;
-  document.getElementById('tts-speed-val').textContent = `${ttsRate}×`;
-  document.getElementById('tts-speed').setAttribute('aria-valuenow', ttsRate);
-  document.getElementById('tts-speed').setAttribute('aria-label',
-    `Viteză voce, curent: ${display}`);
-  speak(`Viteză: ${display}`, true);
-}
-
-// ─────────────────────────────────────────
-//  DATE DEMO
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════
 const USERS = [
   { id:'u1', name:'Maria',    phone:'+40721000001', online:true  },
   { id:'u2', name:'Andrei',   phone:'+40721000002', online:true  },
@@ -738,161 +909,216 @@ const USERS = [
   { id:'u5', name:'Anonim',   phone:'+40721000005', online:false },
 ];
 
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
 //  STATE
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
 let profile     = null;
 let favorites   = new Set(JSON.parse(localStorage.getItem('blinder_favs') || '[]'));
 let isAvailable = false;
-let activeTab   = 'online';
-let userTabIdx  = 20; // dynamic tabindex start for user buttons
+let _micTarget  = null;
+let _recog      = null;
+let _micFinal   = '';
 
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
 //  BOOT
-// ─────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const saved      = localStorage.getItem('blinder_profile');
-  const firstVisit = !localStorage.getItem('blinder_visited');
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
 
+  // Speed slider
+  const spd = document.getElementById('spd');
+  spd.addEventListener('input', () => {
+    _rate = parseFloat(spd.value);
+    document.getElementById('spd-val').textContent = _rate + '×';
+    speak('Viteză ' + (_rate === 1 ? 'normală' : _rate + ' ori'), true);
+  });
+  spd.dataset.speak = 'Slider viteză voce. Folosește săgețile stânga și dreapta.';
+
+  // Voice buttons
+  document.getElementById('stop-btn').addEventListener('click', stopSpeech);
+  document.getElementById('stop-btn').dataset.speak = 'Buton Oprește vocea.';
+
+  document.getElementById('help-btn').addEventListener('click', openTutorial);
+  document.getElementById('help-btn').dataset.speak = 'Buton tutorial. Apasă Enter pentru instrucțiuni audio.';
+
+  // Profile form
+  document.getElementById('save-btn').addEventListener('click', saveProfile);
+  document.getElementById('save-btn').dataset.speak = 'Buton Intră în aplicație. Apasă Enter pentru a salva profilul.';
+
+  document.getElementById('inp-name').dataset.speak  = 'Câmpul Nume. Introdu cum vrei să fii văzut de alții.';
+  document.getElementById('inp-phone').dataset.speak = 'Câmpul Număr de telefon. Introdu cu prefixul plus 40.';
+
+  document.getElementById('mic-name-btn').addEventListener('click', () => startMic('name'));
+  document.getElementById('mic-name-btn').dataset.speak = 'Buton dictare nume. Apasă Enter și vorbește.';
+
+  document.getElementById('mic-phone-btn').addEventListener('click', () => startMic('phone'));
+  document.getElementById('mic-phone-btn').dataset.speak = 'Buton dictare telefon. Apasă Enter și vorbește.';
+
+  // Tabs
+  document.getElementById('tab-online').addEventListener('click', () => switchTab('online'));
+  document.getElementById('tab-online').dataset.speak = 'Tab Online acum. Utilizatori disponibili pentru apel.';
+
+  document.getElementById('tab-fav').addEventListener('click', () => switchTab('fav'));
+  document.getElementById('tab-fav').dataset.speak = 'Tab Favoriți. Contactele tale salvate.';
+
+  // Call modal
+  document.getElementById('call-cancel').addEventListener('click', closeCallModal);
+  document.getElementById('call-cancel').dataset.speak = 'Buton Anulează apelul.';
+  document.getElementById('call-confirm').dataset.speak = 'Buton Sună acum. Apasă Enter pentru a suna.';
+
+  // Tutorial
+  document.getElementById('tut-read-btn').addEventListener('click', readTutorial);
+  document.getElementById('tut-read-btn').dataset.speak = 'Buton Citește tutorialul cu voce tare.';
+  document.getElementById('tut-close-btn').addEventListener('click', closeTutorial);
+  document.getElementById('tut-close-btn').dataset.speak = 'Buton Am înțeles. Închide tutorialul.';
+
+  // Mic modal
+  document.getElementById('mic-cancel-btn').addEventListener('click', closeMic);
+  document.getElementById('mic-cancel-btn').dataset.speak = 'Buton Anulează dictarea.';
+  document.getElementById('mic-accept-btn').addEventListener('click', acceptMic);
+  document.getElementById('mic-accept-btn').dataset.speak = 'Buton Acceptă textul dictat.';
+
+  // Backdrop clicks
+  ['call-modal','tut-modal','mic-modal'].forEach(id => {
+    document.getElementById(id).addEventListener('click', e => {
+      if (e.target === e.currentTarget) {
+        if (id === 'call-modal') closeCallModal();
+        if (id === 'tut-modal')  closeTutorial();
+        if (id === 'mic-modal')  closeMic();
+      }
+    });
+  });
+
+  // Escape
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    closeCallModal(); closeTutorial(); closeMic();
+  });
+
+  // Load saved profile
+  const saved = localStorage.getItem('blinder_profile');
   if (saved) {
     profile = JSON.parse(saved);
-    showProfileView();
-    showContacts();
+    _renderProfileView();
+    _showContacts();
     renderLists();
   }
 
-  // Speed slider
-  document.getElementById('tts-speed').addEventListener('input', e => updateSpeed(e.target.value));
-  document.getElementById('tts-speed').addEventListener('focus', () => {
-    speakFocus(`Slider viteză voce. Valoare curentă: ${ttsRate} ori. Folosește săgețile stânga-dreapta pentru a modifica.`);
-  });
-
-  // Escape closes modals
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeCallModal(); closeTutorial(); }
-  });
-
-  // Modal backdrop clicks
-  document.getElementById('call-modal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeCallModal();
-  });
-  document.getElementById('tutorial-modal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeTutorial();
-  });
-
-  // ── USER GESTURE UNLOCK ──
-  // Browsers block autoplay speech until the user interacts.
-  // We listen for first click/keydown anywhere on the page.
-  const unlock = () => {
-    if (userReady) return;
-    userReady = true;
-
+  // First gesture unlock
+  const firstVisit = !localStorage.getItem('blinder_visited');
+  function unlock() {
+    if (_ready) return;
+    _ready = true;
     if (firstVisit) {
       localStorage.setItem('blinder_visited', '1');
-      speak('Bun venit la Blinder! Deschid tutorialul. Apasă butonul Citește cu voce tare pentru a asculta instrucțiunile.');
-      setTimeout(() => openTutorial(false), 400);
+      speak('Bun venit la Blinder!');
+      speak('Apasă butonul Cum funcționează pentru tutorial audio.');
+      setTimeout(openTutorial, 800);
     } else if (profile) {
-      speak(`Bun venit înapoi, ${profile.name}!`);
+      speak('Bun venit înapoi, ' + profile.name + '!');
     } else {
       speak('Bun venit la Blinder. Introdu numele și numărul tău pentru a începe.');
     }
-  };
-
-  document.addEventListener('click',   unlock, { once: true });
-  document.addEventListener('keydown', unlock, { once: true });
-
-  // Cooldown on all buttons to prevent double-speak
-  document.addEventListener('mousedown', setFocusCooldown);
-  document.addEventListener('touchstart', setFocusCooldown);
+  }
+  document.addEventListener('click',      unlock, { once: true });
+  document.addEventListener('keydown',    unlock, { once: true });
+  document.addEventListener('touchstart', unlock, { once: true, passive: true });
 });
 
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
 //  TUTORIAL
-// ─────────────────────────────────────────
-const TUTORIAL_LINES = [
+// ═══════════════════════════════════════════════════
+const TUT_LINES = [
   'Bun venit la Blinder, aplicația de apeluri pentru persoane nevăzătoare.',
-  'Pasul unu. Profilul tău. Introdu numele și numărul de telefon. Poți folosi un pseudonim.',
-  'Pasul doi. Disponibilitate. Apasă butonul Arată-mă disponibil ca alți utilizatori să te poată suna.',
-  'Pasul trei. Sună pe cineva. În tabul Online acum găsești persoanele disponibile. Apasă butonul cu telefonul de lângă un nume.',
+  'Pasul unu. Profilul tău. Introdu numele și numărul de telefon. Apasă butonul microfon lângă fiecare câmp pentru a dicta cu vocea.',
+  'Pasul doi. Disponibilitate. Apasă butonul Arată-mă disponibil ca alții să te poată suna.',
+  'Pasul trei. Sună pe cineva. În tabul Online acum apasă butonul cu telefonul de lângă un nume.',
   'Pasul patru. Confirmare apel. Apare un dialog: apasă Sună acum sau Anulează.',
-  'Pasul cinci. Favoriți. Apasă steluța lângă un utilizator pentru a-l salva. Îi găsești în tabul Favoriți.',
-  'Pasul șase. Vocea aplicației. Totul se citește cu voce tare. Schimbă viteza sau apasă Oprește vocea oricând.',
-  'Pasul șapte. Navigare cu Tab. Apasă tasta Tab pentru a trece la elementul următor. Enter activează butoanele. Escape închide orice dialog.',
+  'Pasul cinci. Favoriți. Apasă steluța lângă un utilizator pentru a-l salva.',
+  'Pasul șase. Vocea aplicației. Totul se citește cu voce tare. Reglează viteza sau apasă Oprește vocea.',
+  'Pasul șapte. Navigare cu Tab. Tasta Tab trece la elementul următor. Enter activează. Escape închide orice dialog.',
   'Tutorialul s-a terminat. Apasă Am înțeles pentru a folosi aplicația.',
 ];
 
-function openTutorial(autoRead = false) {
-  document.getElementById('tutorial-modal').classList.add('open');
+function openTutorial() {
+  document.getElementById('tut-modal').classList.add('open');
   arLive('Dialog tutorial deschis.');
-  if (autoRead) {
-    setTimeout(readTutorialAloud, 300);
-  } else {
-    speak('Tutorial deschis. Apasă Citește cu voce tare pentru instrucțiuni audio.', true);
-    setTimeout(() => document.getElementById('read-aloud-btn').focus(), 150);
-  }
+  setTimeout(() => document.getElementById('tut-read-btn').focus(), 150);
 }
 
 function closeTutorial() {
-  document.getElementById('tutorial-modal').classList.remove('open');
+  document.getElementById('tut-modal').classList.remove('open');
   stopSpeech();
-  arLive('Tutorial închis.');
-  speak('Tutorial închis.');
+  speak('Tutorial închis.', true);
 }
 
-function readTutorialAloud() {
+function readTutorial() {
   stopSpeech();
-  TUTORIAL_LINES.forEach(l => speak(l));
+  TUT_LINES.forEach(l => speak(l));
 }
 
-// ─────────────────────────────────────────
-//  PROFIL
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════════════
 function saveProfile() {
-  const name  = document.getElementById('input-name').value.trim();
-  const phone = document.getElementById('input-phone').value.trim();
+  const name  = document.getElementById('inp-name').value.trim();
+  const phone = document.getElementById('inp-phone').value.trim();
 
   if (!name) {
     speak('Eroare: te rugăm să introduci un nume sau pseudonim.', true);
-    document.getElementById('input-name').focus();
+    setTimeout(() => document.getElementById('inp-name').focus(), 400);
     return;
   }
   if (!phone) {
     speak('Eroare: te rugăm să introduci numărul de telefon.', true);
-    document.getElementById('input-phone').focus();
+    setTimeout(() => document.getElementById('inp-phone').focus(), 400);
     return;
   }
 
   profile = { name, phone };
   localStorage.setItem('blinder_profile', JSON.stringify(profile));
-
-  showProfileView();
-  showContacts();
+  _renderProfileView();
+  _showContacts();
   renderLists();
-  speak(`Profil salvat. Bun venit, ${name}! Acum poți vedea utilizatorii disponibili.`, true);
-  setTimeout(() => document.getElementById('toggle-status-btn').focus(), 300);
+  speak('Profil salvat. Bun venit, ' + name + '! Acum poți vedea utilizatorii disponibili.', true);
+  setTimeout(() => document.getElementById('toggle-btn').focus(), 600);
 }
 
-function showProfileView() {
+function _renderProfileView() {
   document.getElementById('profile-form').hidden = true;
   document.getElementById('profile-view').hidden = false;
-  document.getElementById('profile-display-name').textContent = profile.name;
-  document.getElementById('profile-display-phone').textContent = profile.phone;
+  document.getElementById('pname').textContent   = profile.name;
+  document.getElementById('pphone').textContent  = profile.phone;
+  // Avatar initials
+  document.getElementById('profile-avatar').textContent = profile.name.charAt(0).toUpperCase();
+
+  const tb = document.getElementById('toggle-btn');
+  if (!tb._wired) {
+    tb._wired = true;
+    tb.addEventListener('click', toggleStatus);
+    tb.dataset.speak = 'Buton schimbare status. Apasă Enter pentru a deveni disponibil sau offline.';
+  }
+  const eb = document.getElementById('edit-btn');
+  if (!eb._wired) {
+    eb._wired = true;
+    eb.addEventListener('click', editProfile);
+    eb.dataset.speak = 'Buton Editează profilul. Apasă Enter pentru a modifica.';
+  }
 }
 
 function editProfile() {
   document.getElementById('profile-view').hidden = true;
   document.getElementById('profile-form').hidden = false;
-  document.getElementById('input-name').value  = profile.name;
-  document.getElementById('input-phone').value = profile.phone;
+  document.getElementById('inp-name').value  = profile.name;
+  document.getElementById('inp-phone').value = profile.phone;
   speak('Editare profil. Modifică datele și apasă Intră în aplicație.', true);
-  setTimeout(() => document.getElementById('input-name').focus(), 100);
+  setTimeout(() => document.getElementById('inp-name').focus(), 400);
 }
 
 function toggleStatus() {
   isAvailable = !isAvailable;
   const badge = document.getElementById('status-badge');
   const label = document.getElementById('status-label');
-  const btn   = document.getElementById('toggle-status-btn');
+  const tb    = document.getElementById('toggle-btn');
   const dot   = badge.querySelector('.dot');
 
   if (isAvailable) {
@@ -900,180 +1126,142 @@ function toggleStatus() {
     badge.setAttribute('aria-label', 'Ești disponibil pentru apeluri');
     label.textContent = 'Disponibil';
     dot.classList.add('pulse');
-    btn.textContent = '🔴 Arată-mă ocupat';
-    btn.setAttribute('aria-label', 'Arată-mă ocupat — schimbă statusul la offline');
+    tb.textContent = '🔴 Arată-mă ocupat';
+    tb.setAttribute('aria-label', 'Schimbă statusul la offline');
     speak('Ești acum disponibil. Alți utilizatori te pot vedea și suna.', true);
   } else {
     badge.className = 'status-badge offline';
     badge.setAttribute('aria-label', 'Ești offline');
     label.textContent = 'Offline';
     dot.classList.remove('pulse');
-    btn.textContent = '🟢 Arată-mă disponibil';
-    btn.setAttribute('aria-label', 'Arată-mă disponibil pentru apeluri');
+    tb.textContent = '🟢 Arată-mă disponibil';
+    tb.setAttribute('aria-label', 'Schimbă statusul la disponibil');
     speak('Ești acum offline. Alți utilizatori nu te pot suna.', true);
   }
 }
 
-// ─────────────────────────────────────────
-//  CONTACTE
-// ─────────────────────────────────────────
-function showContacts() {
+// ═══════════════════════════════════════════════════
+//  CONTACTS
+// ═══════════════════════════════════════════════════
+function _showContacts() {
   document.getElementById('contacts-section').hidden = false;
 }
 
-function renderLists() {
-  renderOnline();
-  renderFav();
-}
+function renderLists() { _renderOnline(); _renderFav(); }
 
-function renderOnline() {
-  const el = document.getElementById('online-list');
+function _renderOnline() {
+  const el   = document.getElementById('online-list');
   const list = USERS.filter(u => u.online);
   if (!list.length) {
-    el.innerHTML = '<div class="empty">Niciun utilizator disponibil momentan.<br>Încearcă mai târziu.</div>';
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🔇</span>Niciun utilizator disponibil momentan.<br>Încearcă mai târziu.</div>';
     return;
   }
   el.innerHTML = '';
-  list.forEach((u, i) => el.appendChild(makeUserItem(u, 20 + i * 2)));
+  list.forEach(u => el.appendChild(_makeItem(u)));
 }
 
-function renderFav() {
-  const el = document.getElementById('fav-list');
+function _renderFav() {
+  const el   = document.getElementById('fav-list');
   const list = USERS.filter(u => favorites.has(u.id));
   if (!list.length) {
-    el.innerHTML = '<div class="empty">Nu ai favoriți încă.<br>Apasă ⭐ lângă un utilizator pentru a-l adăuga.</div>';
+    el.innerHTML = '<div class="empty"><span class="empty-icon">⭐</span>Nu ai favoriți încă.<br>Apasă ☆ lângă un utilizator pentru a-l adăuga.</div>';
     return;
   }
   el.innerHTML = '';
-  list.forEach((u, i) => el.appendChild(makeUserItem(u, 50 + i * 2)));
+  list.forEach(u => el.appendChild(_makeItem(u)));
 }
 
-function makeUserItem(user, baseTab) {
-  const isFav = favorites.has(user.id);
-  const statusTxt = user.online ? 'Disponibil pentru apel' : 'Offline';
-  const favLabel  = isFav
-    ? `Elimină din favoriți pe ${user.name}`
-    : `Adaugă la favoriți pe ${user.name}`;
-  const callLabel = `Sună pe ${user.name}. ${statusTxt}.`;
+function _makeItem(user) {
+  const isFav   = favorites.has(user.id);
+  const statusT = user.online ? 'Disponibil pentru apel' : 'Offline, nu poate fi sunat';
+  const favT    = (isFav ? 'Elimină din favoriți' : 'Adaugă la favoriți') + ': ' + user.name;
+  const callT   = 'Sună pe ' + user.name + '. ' + statusT + '.';
 
-  const item = document.createElement('div');
-  item.className = 'user-item';
-  item.setAttribute('role', 'listitem');
-
-  item.innerHTML = `
+  const div = document.createElement('div');
+  div.className = 'user-item';
+  div.setAttribute('role', 'listitem');
+  div.innerHTML = `
+    <div class="user-avatar" aria-hidden="true">${esc(user.name.charAt(0).toUpperCase())}</div>
     <div class="user-info">
       <div class="user-name">${esc(user.name)}</div>
       <div class="user-status">
-        ${ user.online
-          ? '<span style="color:var(--green)">● Disponibil</span>'
-          : '<span style="color:var(--muted)">○ Offline</span>' }
+        <span class="status-dot ${user.online ? 'on' : ''}" aria-hidden="true"></span>
+        <span style="color:${user.online ? 'var(--green)' : 'var(--text3)'}">
+          ${user.online ? 'Disponibil' : 'Offline'}
+        </span>
       </div>
     </div>
     <div class="user-actions">
-      <button
-        class="icon-btn fav-btn"
-        aria-label="${favLabel}"
+      <button class="icon-btn fav-btn"
+        aria-label="${esc(favT)}"
         aria-pressed="${isFav}"
-        tabindex="${baseTab}"
-        data-uid="${user.id}"
-        data-action="fav"
+        data-speak="${esc(favT)}"
       >${isFav ? '★' : '☆'}</button>
-      <button
-        class="icon-btn call-btn"
-        aria-label="${callLabel}"
-        tabindex="${baseTab + 1}"
-        data-uid="${user.id}"
-        data-action="call"
+      <button class="icon-btn call-btn"
+        aria-label="${esc(callT)}"
+        data-speak="${esc(callT)}"
       >📞</button>
-    </div>
-  `;
+    </div>`;
 
-  // Events after building
-  item.querySelector('[data-action="fav"]').addEventListener('focus', () => {
-    speakFocus(favLabel);
-  });
-  item.querySelector('[data-action="call"]').addEventListener('focus', () => {
-    speakFocus(callLabel);
-  });
-  item.querySelector('[data-action="fav"]').addEventListener('click', () => {
-    setFocusCooldown(); toggleFav(user.id);
-  });
-  item.querySelector('[data-action="call"]').addEventListener('click', () => {
-    setFocusCooldown(); initiateCall(user.id);
-  });
-
-  return item;
+  div.querySelector('.fav-btn').addEventListener('click', () => toggleFav(user.id));
+  div.querySelector('.call-btn').addEventListener('click', () => initiateCall(user.id));
+  return div;
 }
 
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
 //  TABS
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
 function switchTab(tab) {
-  activeTab = tab;
   const isOnline = tab === 'online';
-
   document.getElementById('tab-online').setAttribute('aria-selected', isOnline ? 'true' : 'false');
-  document.getElementById('tab-fav').setAttribute('aria-selected', isOnline ? 'false' : 'true');
+  document.getElementById('tab-fav').setAttribute('aria-selected',    isOnline ? 'false' : 'true');
   document.getElementById('panel-online').hidden = !isOnline;
   document.getElementById('panel-fav').hidden    =  isOnline;
-
-  if (isOnline) {
-    const n = USERS.filter(u => u.online).length;
-    speak(`Online acum. ${n} utilizatori disponibili.`, true);
-  } else {
-    const n = USERS.filter(u => favorites.has(u.id)).length;
-    speak(`Favoriți. ${n} contacte salvate.`, true);
-  }
+  speak(isOnline
+    ? 'Online acum. ' + USERS.filter(u => u.online).length + ' utilizatori disponibili.'
+    : 'Favoriți. '    + USERS.filter(u => favorites.has(u.id)).length + ' contacte salvate.',
+    true);
 }
 
-// ─────────────────────────────────────────
-//  FAVORIȚI
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  FAVORITES
+// ═══════════════════════════════════════════════════
 function toggleFav(uid) {
   const user = USERS.find(u => u.id === uid);
   if (!user) return;
   if (favorites.has(uid)) {
     favorites.delete(uid);
-    toast(`${user.name} eliminat din favoriți`);
-    speak(`${user.name} eliminat din favoriți.`, true);
+    toast(user.name + ' eliminat din favoriți');
+    speak(user.name + ' eliminat din favoriți.', true);
   } else {
     favorites.add(uid);
-    toast(`${user.name} adăugat la favoriți`);
-    speak(`${user.name} adăugat la favoriți.`, true);
+    toast(user.name + ' adăugat la favoriți ⭐');
+    speak(user.name + ' adăugat la favoriți.', true);
   }
   localStorage.setItem('blinder_favs', JSON.stringify([...favorites]));
   renderLists();
 }
 
-// ─────────────────────────────────────────
-//  APEL
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  CALL
+// ═══════════════════════════════════════════════════
 function initiateCall(uid) {
   const user = USERS.find(u => u.id === uid);
   if (!user) return;
 
-  document.getElementById('call-modal-title').textContent    = user.name;
-  document.getElementById('call-modal-question').textContent = `Ești pe cale să suni pe ${user.name}. Confirmi?`;
-  document.getElementById('call-confirm').href = `tel:${user.phone}`;
-  document.getElementById('call-confirm').setAttribute('aria-label', `Confirmă și sună pe ${user.name}`);
+  document.getElementById('cm-name').textContent = user.name;
+  document.getElementById('cm-q').textContent    = 'Ești pe cale să suni pe ' + user.name + '. Confirmi?';
+  document.getElementById('cm-avatar').textContent = user.name.charAt(0).toUpperCase();
+
+  const conf = document.getElementById('call-confirm');
+  conf.href  = 'tel:' + user.phone;
+  conf.setAttribute('aria-label', 'Sună acum pe ' + user.name);
+  conf.dataset.speak = 'Buton Sună acum pe ' + user.name + '. Apasă Enter pentru a suna.';
 
   document.getElementById('call-modal').classList.add('open');
-  arLive(`Dialog apel: ${user.name}`);
-
-  speak(
-    `Confirmare apel. Ești pe cale să suni pe ${user.name}. Apasă Sună acum pentru a confirma sau Anulează pentru a renunța.`,
-    true
-  );
-
-  setTimeout(() => document.getElementById('call-confirm').focus(), 200);
-
-  // Focus management on confirm
-  document.getElementById('call-confirm').onfocus = () => {
-    speakFocus(`Buton Sună acum pe ${user.name}. Apasă Enter pentru a suna.`);
-  };
-  document.getElementById('call-cancel').onfocus = () => {
-    speakFocus('Buton Anulează apelul.');
-  };
+  arLive('Dialog confirmare apel: ' + user.name);
+  speak('Confirmare apel. Ești pe cale să suni pe ' + user.name + '. Apasă Sună acum pentru a confirma sau Anulează pentru a renunța.', true);
+  setTimeout(() => document.getElementById('call-confirm').focus(), 400);
 }
 
 function closeCallModal() {
@@ -1081,28 +1269,131 @@ function closeCallModal() {
   speak('Apel anulat.', true);
 }
 
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  MIC
+// ═══════════════════════════════════════════════════
+function startMic(target) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    speak('Dictarea nu este disponibilă în acest browser. Te rugăm să folosești Chrome sau Edge.', true);
+    return;
+  }
+  _micTarget = target;
+  _micFinal  = '';
+
+  const label = target === 'name' ? 'numele' : 'numărul de telefon';
+  document.getElementById('mic-title').textContent      = 'Dictează ' + label;
+  document.getElementById('mic-status').textContent     = 'Pregătesc microfonul...';
+  document.getElementById('mic-transcript').innerHTML   = '<span style="color:var(--text3)">Textul dictat va apărea aici...</span>';
+  document.getElementById('mic-orb').classList.remove('active');
+  document.getElementById('mic-modal').classList.add('open');
+  arLive('Dialog dictare deschis.');
+
+  speak('Dictează ' + label + '. Vorbește clar după ce microfonul pornește.', true);
+
+  setTimeout(() => {
+    _recog = new SR();
+    _recog.lang            = 'ro-RO';
+    _recog.continuous      = true;
+    _recog.interimResults  = true;
+    _recog.maxAlternatives = 1;
+
+    _recog.onstart = () => {
+      document.getElementById('mic-status').textContent = '🔴 Ascult... Vorbește acum.';
+      document.getElementById('mic-orb').classList.add('active');
+    };
+
+    _recog.onresult = (e) => {
+      let interim = '';
+      _micFinal   = '';
+      for (let i = 0; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) _micFinal += t + ' ';
+        else interim += t;
+      }
+      document.getElementById('mic-transcript').textContent = (_micFinal + interim).trim() || '...';
+    };
+
+    _recog.onerror = (e) => {
+      const errs = {
+        'no-speech':     'Nu am auzit nimic. Încearcă din nou.',
+        'audio-capture': 'Microfonul nu este accesibil.',
+        'not-allowed':   'Permisiunea pentru microfon a fost refuzată.',
+        'network':       'Eroare de rețea.',
+      };
+      const msg = errs[e.error] || 'Eroare microfon: ' + e.error;
+      document.getElementById('mic-status').textContent = msg;
+      document.getElementById('mic-orb').classList.remove('active');
+      speak(msg, true);
+    };
+
+    _recog.onend = () => {
+      const got = _micFinal.trim();
+      document.getElementById('mic-orb').classList.remove('active');
+      document.getElementById('mic-status').textContent = got
+        ? '✓ Gata. Apasă Acceptă sau Anulează.'
+        : 'Nu am auzit nimic. Încearcă din nou sau anulează.';
+      if (got) {
+        speak('Am auzit: ' + got + '. Apasă Acceptă pentru a salva.', true);
+        setTimeout(() => document.getElementById('mic-accept-btn').focus(), 300);
+      }
+    };
+
+    _recog.start();
+  }, 1500);
+}
+
+function closeMic() {
+  if (_recog) { try { _recog.stop(); } catch(e){} _recog = null; }
+  document.getElementById('mic-modal').classList.remove('open');
+  document.getElementById('mic-orb').classList.remove('active');
+  speak('Dictare anulată.', true);
+}
+
+function acceptMic() {
+  const text = _micFinal.trim() ||
+    document.getElementById('mic-transcript').textContent.trim();
+  if (!text || text === '...' || text.includes('va apărea')) {
+    speak('Nu există text de acceptat. Încearcă din nou.', true);
+    return;
+  }
+  if (_recog) { try { _recog.stop(); } catch(e){} _recog = null; }
+
+  if (_micTarget === 'name') {
+    document.getElementById('inp-name').value = text;
+    speak('Nume salvat: ' + text, true);
+  } else {
+    const cleaned = text.replace(/[^0-9+\s\-]/g, '').trim();
+    document.getElementById('inp-phone').value = cleaned || text;
+    speak('Număr salvat: ' + (cleaned || text), true);
+  }
+
+  document.getElementById('mic-modal').classList.remove('open');
+  document.getElementById('mic-orb').classList.remove('active');
+  arLive('Text dictat acceptat și introdus în câmp.');
+}
+
+// ═══════════════════════════════════════════════════
 //  HELPERS
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
 function arLive(msg) {
   const el = document.getElementById('ar');
   el.textContent = '';
   requestAnimationFrame(() => { el.textContent = msg; });
 }
 
-let toastTimer = null;
+let _tt;
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  clearTimeout(_tt);
+  _tt = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
 function esc(s) {
-  return String(s).replace(/[&<>"']/g, c =>
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
-  );
+  return String(s).replace(/[&<>"']/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 </script>
 </body>
